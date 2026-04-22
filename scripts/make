@@ -3,14 +3,9 @@
 set -e
 set -o pipefail
 
-TARGET=$1
-TARGET_CFLAGS=""
-TARGET_LDFLAGS=""
-EXTRA_CT_NG_ARGS=""
-
 if [[ $# -lt 1 || -z "$1" ]]; then
     echo "Usage: $0 <target>" >&2
-    echo "Example: $0 x86_64-unknown-linux-gnu" >&2
+    echo "Example: $0 aarch64-rpi5-linux-gnu" >&2
     exit 1
 fi
 
@@ -19,6 +14,10 @@ if [[ ! -d "targets/${TARGET}" ]]; then
     echo "Error: target '${TARGET}' not found in targets/" >&2
     exit 1
 fi
+
+TARGET_CFLAGS=""
+TARGET_LDFLAGS=""
+EXTRA_CT_NG_ARGS="${EXTRA_CT_NG_ARGS:-}"
 
 # packages
 sudo apt-get update -qy
@@ -47,7 +46,7 @@ popd
 
 # crosstool-ng
 sudo mkdir -p /opt
-sudo chmod 0777 /opt
+sudo chown 0777 /opt
 sudo rm -rf /opt/ct-ng
 pushd builder
 ./bootstrap
@@ -61,7 +60,9 @@ export COMMON="-ftree-vectorize -fomit-frame-pointer -funsafe-math-optimizations
 
 case "${TARGET}" in
     aarch64-rpi3-linux-*)
-        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc+crypto -mcpu=cortex-a53+crc -mtune=cortex-a53 ${COMMON}"
+        # BCM2837 (Pi 3 / Zero 2W) Cortex-A53 does not expose the ARMv8
+        # Crypto Extensions; do not emit AES/SHA instructions for this target.
+        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mcpu=cortex-a53+crc -mtune=cortex-a53 ${COMMON}"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m64"
         ;;
     aarch64-rpi4-linux-*)
@@ -77,7 +78,9 @@ case "${TARGET}" in
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     armv7-rpi2-linux-*)
-        export TARGET_CFLAGS="${OPT} -march=armv7-a+neon-vfpv4+mp -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard ${COMMON}"
+        # '+neon-vfpv4' is an -mfpu value, not a valid -march extension; use
+        # '+mp' as the ARMv7-a extension and keep the FPU in -mfpu=.
+        export TARGET_CFLAGS="${OPT} -march=armv7-a+mp -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard ${COMMON}"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m32"
         ;;
     armv8-rpi3-linux-*)
@@ -126,5 +129,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # tarball
 sudo mv /opt/x-tools/"${TARGET}" .
 sudo chown -R root:root "${TARGET}"
-env XZ_OPT="-T0" sudo tar -cJvf "${TARGET}".tar.xz "${TARGET}"
-sudo sha256sum "${TARGET}".tar.xz | awk '{ print $1 }' > "${TARGET}".tar.xz.sha256
+sudo tar --sort=name --owner=0 --group=0 --numeric-owner \
+    -I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
+sha256sum "${TARGET}".tar.xz > "${TARGET}".tar.xz.sha256
