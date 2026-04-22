@@ -29,4 +29,4 @@ CT_GCC_V_15=y
 # CT_CC_GCC_ENABLE_DEFAULT_PIE is not set
 CT_BINUTILS_V_2_46=y
 CT_TOOLCHAIN_PKGVERSION="Raspberry Pi"
-CT_TARGET_CFLAGS="-O2 -pipe -mthumb -ffixed-r9""
+CT_TARGET_CFLAGS="-O2 -pipe -mthumb -ffixed-r9"
