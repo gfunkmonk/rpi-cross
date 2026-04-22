@@ -33,7 +33,7 @@ name: Release
         default: false
 concurrency:
   group: '${{ github.workflow }}-${{ github.ref }}'
-  cancel-in-progress: true
+  cancel-in-progress: false
 permissions:
   contents: read
 jobs:
@@ -53,9 +53,9 @@ jobs:
           - aarch64-rpi5-linux-gnu
           - aarch64-rpi5-linux-musl
           - aarch64-rpi5-linux-uclibc
-          - armv6-rpi-linux-gnueabi
-          - armv6-rpi-linux-musleabi
-          - armv6-rpi-linux-uclibcgnueabi
+          - armv6-rpi-linux-gnueabihf
+          - armv6-rpi-linux-musleabihf
+          - armv6-rpi-linux-uclibcgnueabihf
           - armv7-rpi2-linux-gnueabihf
           - armv7-rpi2-linux-musleabihf
           - armv7-rpi2-linux-uclibcgnueabihf
@@ -91,13 +91,13 @@ jobs:
         run: |
           test -f /usr/share/doc/kitware-archive-keyring/copyright || wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
           echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
-      - name: CCACHE Shit
+      - name: CCACHE Stuff
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt-get -y update
           DEBIAN_FRONTEND=noninteractive sudo apt-get -y install apt-utils ccache ca-certificates gpg wget zstd
 
           cat >> $GITHUB_ENV << 'EOF'
-          CCACHE_SLOPPINESS=locale,time_macros,random_seed,file_macro,include_file_mtime,include_file_ctime,file_stat_matches,pch_defines,clang_index_store,include_file_ctime,ivfsoverlay,modules,system_headers
+          CCACHE_SLOPPINESS=locale,time_macros,random_seed,file_macro,include_file_mtime,include_file_ctime,file_stat_matches,pch_defines,clang_index_store,ivfsoverlay,modules,system_headers
           CCACHE_NOHASHDIR=true
           CCACHE_COMPRESS=true
           CCACHE_COMPRESSLEVEL=18
@@ -115,8 +115,6 @@ jobs:
           echo "CCACHE_DIR=/mnt/ccache" >> $GITHUB_ENV
           echo "CCACHE Dir Set!"
           # Setup tarballs dir for download caching
-          #sudo mkdir -p /mnt/tarballs
-          #sudo chown -R $USER:$USER /mnt/tarballs
           sudo mkdir -p /mnt/tarballs
           sudo chown -R $USER:$USER /mnt/tarballs
           df -h
@@ -141,10 +139,6 @@ jobs:
           restore-keys: |
             tarballs-${{ runner.os }}-${{ matrix.target }}-
             tarballs-${{ runner.os }}-
-      - name: Enable Kitware Repository
-        run: |
-          test -f /usr/share/doc/kitware-archive-keyring/copyright || wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
-          echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
       - if: '${{ inputs.sshserver }}'
         name: SSH Server-ing
         uses: valeriangalliat/action-sshd-cloudflared@v4
@@ -186,6 +180,12 @@ jobs:
     permissions:
       contents: write
     steps:
+      - name: Validate inputs
+        run: |
+          if [[ -z "${{ inputs.release_name }}" ]]; then
+            echo "::error::release_name is required when make_release is true"
+            exit 1
+          fi
       - name: Checkout
         uses: actions/checkout@v6
         with:
@@ -196,13 +196,17 @@ jobs:
           path: release
           pattern: '*.tar.*'
           merge-multiple: true
-      - name: Generate checksums
+      - name: Generate release
         run: |
-          echo "| Filename | Sha256sum |" > RELEASE.md
-          echo "| -------- | --------- |" >> RELEASE.md
-          for i in release/*.sha256; do
-            echo "| $(basename $i .sha256) | $(cat $i) |" >> RELEASE.md
-          done
+          {
+            echo "| Filename | SHA-256 |"
+            echo "| -------- | ------- |"
+            for i in release/*.sha256; do
+            echo "| $(basename "$i" .sha256) | \`$(awk '{print $1}' "$i")\` |" >> RELEASE.md
+            done
+          } > RELEASE.md
+          # Aggregate hashes into a single SHA256SUMS file for easy verification
+          (cd release && cat *.sha256 > SHA256SUMS)
       - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
         name: Create Release
         uses: xiechangan123/action-gh-release@master
@@ -213,13 +217,8 @@ jobs:
           draft: false
           generate_release_notes: false
           make_latest: true
-          files: release/*-*-*.tar.*
+          files: |
+            release/*.tar.xz
+            release/*.tar.xz.sha256
+            release/SHA256SUMS
           body_path: RELEASE.md
-      - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
-        name: Finalize Release
-        env:
-          GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-        run: |
-          # The action-gh-release step above handles most files,
-          # but this ensures the body/notes are updated correctly.
-          gh release edit "${{ inputs.release_name }}" --notes-file RELEASE.md

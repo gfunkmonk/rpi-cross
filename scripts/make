@@ -91,6 +91,10 @@ case "${TARGET}" in
         export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mcpu=cortex-a72 -mfpu=neon-fp-armv8 -mfloat-abi=hard ${COMMON}"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m32"
         ;;
+    arm-pico-eabi-gcc*)
+        export TARGET_CFLAGS="${OPT} -mcpu=cortex-m0plus -mthumb -mfloat-abi=soft"
+        export TARGET_LDFLAGS="-mthumb"
+        ;;
 esac
 
 # build

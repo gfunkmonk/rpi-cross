@@ -1,0 +1,78 @@
+name: Validate
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Install shellcheck
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -y update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -y install shellcheck
+
+      - name: shellcheck scripts/make
+        run: shellcheck -x scripts/make
+
+      - name: actionlint
+        uses: reviewdog/action-actionlint@v1
+        with:
+          fail_level: error
+          reporter: github-check
+
+  config-sanity:
+    name: Config sanity
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+
+      - name: Every target dir has a config
+        run: |
+          set -e
+          fail=0
+          for d in targets/*/; do
+            if [[ ! -f "${d}config" ]]; then
+              echo "::error::missing ${d}config"
+              fail=1
+            fi
+          done
+          exit "$fail"
+
+      - name: Matrix matches targets/
+        run: |
+          set -e
+          # Extract the matrix target list from the release workflow and
+          # compare it to the directories in targets/.
+          python3 - <<'PY'
+          import re, sys, pathlib
+          wf = pathlib.Path('.github/workflows/release.yaml').read_text()
+          m = re.search(r'matrix:\s*\n\s*target:\s*\n((?:\s*-\s*\S+\s*\n)+)', wf)
+          if not m:
+              sys.exit("could not find matrix.target in release workflow")
+          matrix = sorted(re.findall(r'-\s*(\S+)', m.group(1)))
+          dirs = sorted(p.name for p in pathlib.Path('targets').iterdir() if p.is_dir())
+          if matrix != dirs:
+              missing = set(dirs) - set(matrix)
+              extra = set(matrix) - set(dirs)
+              msg = []
+              if missing:
+                  msg.append(f"in targets/ but not in matrix: {sorted(missing)}")
+              if extra:
+                  msg.append(f"in matrix but not in targets/: {sorted(extra)}")
+              sys.exit("\n".join(msg))
+          print(f"OK: {len(matrix)} targets")
+          PY
