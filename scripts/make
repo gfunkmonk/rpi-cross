@@ -66,33 +66,33 @@ case "${TARGET}" in
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     aarch64-rpi4-linux-*)
-        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc+simd -mcpu=cortex-a72 -mtune=cortex-a72 ${COMMON}"
+        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a72 ${COMMON}"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     aarch64-rpi5-linux-*)
-        export TARGET_CFLAGS="${OPT} -march=armv8.2-a+crc+crypto -mcpu=cortex-a76+crc+crypto -mtune=cortex-a76 ${COMMON}"
+        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a76+crc+crypto ${COMMON}"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     armv6-rpi-linux-*)
-        export TARGET_CFLAGS="${OPT} -march=armv6zk -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -marm"
+        export TARGET_CFLAGS="${OPT} -march=armv6zk -marm"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     armv7-rpi2-linux-*)
         # '+neon-vfpv4' is an -mfpu value, not a valid -march extension; use
         # '+mp' as the ARMv7-a extension and keep the FPU in -mfpu=.
-        export TARGET_CFLAGS="${OPT} -march=armv7-a+neon-vfpv4+mp -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -marm ${COMMON}"
+        export TARGET_CFLAGS="${OPT} -march=armv7-a+neon-vfpv4+mp -marm ${COMMON}"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     armv8-rpi3-linux-*)
-        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard ${COMMON}"
+        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a53 ${COMMON}"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     armv8-rpi4-linux-*)
-        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mcpu=cortex-a72 -mfpu=neon-fp-armv8 -mfloat-abi=hard ${COMMON}"
+        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a72 ${COMMON}"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     arm-pico-eabi-gcc*)
-        export TARGET_CFLAGS="${OPT} -mcpu=cortex-m0plus -mthumb -mfloat-abi=soft"
+        export TARGET_CFLAGS="${OPT} -mcpu=cortex-m0plus -mthumb"
         export TARGET_LDFLAGS="-mthumb"
         ;;
 esac
