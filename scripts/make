@@ -1,0 +1,119 @@
+#!/bin/bash
+
+set -e
+set -o pipefail
+
+TARGET=$1
+TARGET_CFLAGS=""
+TARGET_LDFLAGS=""
+EXTRA_CT_NG_ARGS=""
+
+if [[ $# -lt 1 || -z "$1" ]]; then
+    echo "Usage: $0 <target>" >&2
+    echo "Example: $0 x86_64-unknown-linux-gnu" >&2
+    exit 1
+fi
+
+TARGET=$1
+if [[ ! -d "targets/${TARGET}" ]]; then
+    echo "Error: target '${TARGET}' not found in targets/" >&2
+    exit 1
+fi
+
+# packages
+sudo apt-get update -qy
+sudo apt-get install -y --no-install-recommends \
+  automake bison \
+  bzip2 ca-certificates \
+  cmake curl file flex \
+  g++ gawk gdb git gperf \
+  help2man libncurses-dev \
+  libssl-dev libtool-bin \
+  make patch pkg-config \
+  python3 rsync texinfo \
+  unzip wget xz-utils \
+  libzstd-dev
+
+# patch
+pushd builder
+git reset --hard HEAD
+git clean -fd
+shopt -s nullglob
+for i in ../targets/"${TARGET}"/*.patch; do
+    patch -Np1 -i "$i"
+done
+shopt -u nullglob
+popd
+
+# crosstool-ng
+sudo mkdir -p /opt
+sudo chmod 0777 /opt
+sudo rm -rf /opt/ct-ng
+pushd builder
+./bootstrap
+./configure --prefix=/opt/ct-ng
+make -j"$(nproc)"
+sudo make install
+popd
+
+export OPT="-O2 -pipe"
+export COMMON="-ftree-vectorize -fomit-frame-pointer -funsafe-math-optimizations"
+
+case "${TARGET}" in
+    aarch64-rpi3-linux-*)
+        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc+crypto -mcpu=cortex-a53+crc -mtune=cortex-a53 ${COMMON}"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m64"
+        ;;
+    aarch64-rpi4-linux-*)
+        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc+simd -mcpu=cortex-a72 -mtune=cortex-a72 ${COMMON}"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m64"
+        ;;
+    aarch64-rpi5-linux-*)
+        export TARGET_CFLAGS="${OPT} -march=armv8.2-a+crc+crypto -mcpu=cortex-a76+crc+crypto -mtune=cortex-a76 ${COMMON}"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m64"
+        ;;
+    armv6-rpi-linux-*)
+        export TARGET_CFLAGS="${OPT} -march=armv6zk -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -marm"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+        ;;
+    armv7-rpi2-linux-*)
+        export TARGET_CFLAGS="${OPT} -march=armv7-a+neon-vfpv4+mp -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard ${COMMON}"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m32"
+        ;;
+    armv8-rpi3-linux-*)
+        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard ${COMMON}"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m32"
+        ;;
+    armv8-rpi4-linux-*)
+        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mcpu=cortex-a72 -mfpu=neon-fp-armv8 -mfloat-abi=hard ${COMMON}"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m32"
+        ;;
+esac
+
+# build
+rm -rf build
+mkdir -p build
+cp targets/"${TARGET}"/config build/.config
+
+# Configure tarballs directory for download caching
+echo 'CT_LOCAL_TARBALLS_DIR="/mnt/tarballs"' >> build/.config
+echo 'CT_SAVE_TARBALLS=y' >> build/.config
+
+# CFLAGS
+if [[ -n "${TARGET_CFLAGS}" ]]; then
+    echo "CT_TARGET_CFLAGS=\"${TARGET_CFLAGS}\"" >> build/.config
+fi
+if [[ -n "${TARGET_LDFLAGS}" ]]; then
+    echo "CT_TARGET_LDFLAGS=\"${TARGET_LDFLAGS}\"" >> build/.config
+fi
+
+pushd build
+/opt/ct-ng/bin/ct-ng olddefconfig
+/opt/ct-ng/bin/ct-ng build."$(nproc)" ${EXTRA_CT_NG_ARGS}
+popd
+
+# tarball
+sudo mv /opt/x-tools/"${TARGET}" .
+sudo chown -R root:root "${TARGET}"
+env XZ_OPT="-T0" sudo tar -cJvf "${TARGET}".tar.xz "${TARGET}"
+sudo sha256sum "${TARGET}".tar.xz | awk '{ print $1 }' > "${TARGET}".tar.xz.sha256
