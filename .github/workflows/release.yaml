@@ -201,7 +201,7 @@ jobs:
           echo "| Filename | Sha256sum |" > RELEASE.md
           echo "| -------- | --------- |" >> RELEASE.md
           for i in release/*.sha256; do
-            echo "| $(basename $i .sha256) | $(cat $i) |" >> RELEASE.md
+            echo "| $(basename "$i" .sha256) | \`$(awk '{print $1}' "$i")\` |" >> RELEASE.md
           done
       - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
         name: Create Release
