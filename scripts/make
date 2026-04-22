@@ -80,7 +80,7 @@ case "${TARGET}" in
     armv7-rpi2-linux-*)
         # '+neon-vfpv4' is an -mfpu value, not a valid -march extension; use
         # '+mp' as the ARMv7-a extension and keep the FPU in -mfpu=.
-        export TARGET_CFLAGS="${OPT} -march=armv7-a+mp -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard ${COMMON}"
+        export TARGET_CFLAGS="${OPT} -march=armv7-a+mp -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard -marm ${COMMON}"
         export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     armv8-rpi3-linux-*)
