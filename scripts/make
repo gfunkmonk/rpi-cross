@@ -3,14 +3,9 @@
 set -e
 set -o pipefail
 
-TARGET=$1
-TARGET_CFLAGS=""
-TARGET_LDFLAGS=""
-EXTRA_CT_NG_ARGS=""
-
 if [[ $# -lt 1 || -z "$1" ]]; then
     echo "Usage: $0 <target>" >&2
-    echo "Example: $0 x86_64-unknown-linux-gnu" >&2
+    echo "Example: $0 aarch64-rpi5-linux-gnu" >&2
     exit 1
 fi
 
@@ -19,6 +14,10 @@ if [[ ! -d "targets/${TARGET}" ]]; then
     echo "Error: target '${TARGET}' not found in targets/" >&2
     exit 1
 fi
+
+TARGET_CFLAGS=""
+TARGET_LDFLAGS=""
+EXTRA_CT_NG_ARGS="${EXTRA_CT_NG_ARGS:-}"
 
 # packages
 sudo apt-get update -qy
@@ -47,7 +46,7 @@ popd
 
 # crosstool-ng
 sudo mkdir -p /opt
-sudo chmod 0777 /opt
+sudo chown "$USER:" /opt
 sudo rm -rf /opt/ct-ng
 pushd builder
 ./bootstrap
@@ -109,11 +108,13 @@ fi
 
 pushd build
 /opt/ct-ng/bin/ct-ng olddefconfig
+# shellcheck disable=SC2086 # EXTRA_CT_NG_ARGS is intentionally word-split
 /opt/ct-ng/bin/ct-ng build."$(nproc)" ${EXTRA_CT_NG_ARGS}
 popd
 
 # tarball
 sudo mv /opt/x-tools/"${TARGET}" .
 sudo chown -R root:root "${TARGET}"
-env XZ_OPT="-T0" sudo tar -cJvf "${TARGET}".tar.xz "${TARGET}"
-sudo sha256sum "${TARGET}".tar.xz | awk '{ print $1 }' > "${TARGET}".tar.xz.sha256
+sudo tar --sort=name --owner=0 --group=0 --numeric-owner \
+    -I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
+sha256sum "${TARGET}".tar.xz > "${TARGET}".tar.xz.sha256
