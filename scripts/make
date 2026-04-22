@@ -59,7 +59,7 @@ popd
 #export COMMON="-ftree-vectorize -fomit-frame-pointer"
 
 #case "${TARGET}" in
-    aarch64-rpi3-linux-*)
+#    aarch64-rpi3-linux-*)
         # BCM2837 (Pi 3 / Zero 2W) Cortex-A53 does not expose the ARMv8
         # Crypto Extensions; do not emit AES/SHA instructions for this target.
 #        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mcpu=cortex-a53+crc -mtune=cortex-a53 ${COMMON}"
