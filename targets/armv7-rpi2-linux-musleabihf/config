@@ -23,4 +23,4 @@ CT_LINKER_MOLD=y
 CT_GCC_V_15=y
 CT_BINUTILS_V_2_46=y
 CT_TOOLCHAIN_PKGVERSION="Raspberry Pi"
-CT_TARGET_CFLAGS="-O2 -pipe -ftree-vectorize -fomit-frame-pointer -marm"
+CT_TARGET_CFLAGS="-O2 -pipe -ftree-vectorize -fomit-frame-pointer -marm -mfloat-abi=hard"
