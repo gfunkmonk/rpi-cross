@@ -1,0 +1,3 @@
+[submodule "builder"]
+	path = builder
+	url = http://github.com/gfunkmonk/crosstool-ng

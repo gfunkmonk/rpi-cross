@@ -1,0 +1,225 @@
+name: Release
+'on':
+  workflow_dispatch:
+    inputs:
+      make_release:
+        description: GitHub Release?
+        type: boolean
+        default: false
+      release_name:
+        description: Release name?
+        type: string
+        default: ''
+      swapspace:
+        description: Add Swap
+        required: true
+        type: boolean
+        default: false
+      swapsize:
+        description: Swap Size (in gb)
+        type: choice
+        required: false
+        options: [3, 5, 10]
+        default: 5
+      sshserver:
+        description: Run SSH Server before build
+        required: true
+        type: boolean
+        default: false
+      freespace:
+        description: Clear Disk Space
+        required: true
+        type: boolean
+        default: false
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: true
+permissions:
+  contents: read
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - aarch64-rpi3-linux-gnu
+          - aarch64-rpi3-linux-musl
+          - aarch64-rpi3-linux-uclibc
+          - aarch64-rpi4-linux-gnu
+          - aarch64-rpi4-linux-musl
+          - aarch64-rpi4-linux-uclibc
+          - aarch64-rpi5-linux-gnu
+          - aarch64-rpi5-linux-musl
+          - aarch64-rpi5-linux-uclibc
+          - armv6-rpi-linux-gnueabi
+          - armv6-rpi-linux-musleabi
+          - armv6-rpi-linux-uclibcgnueabi
+          - armv7-rpi2-linux-gnueabihf
+          - armv7-rpi2-linux-musleabihf
+          - armv7-rpi2-linux-uclibcgnueabihf
+          - armv8-rpi3-linux-gnueabihf
+          - armv8-rpi3-linux-musleabihf
+          - armv8-rpi3-linux-uclibcgnueabihf
+          - armv8-rpi4-linux-gnueabihf
+          - armv8-rpi4-linux-musleabihf
+          - armv8-rpi4-linux-uclibcgnueabihf
+    steps:
+      - if: '${{ inputs.freespace }}'
+        name: Free Up Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          swap-storage: false
+          large-packages: true
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: false
+          docker-images: true
+      - if: '${{ inputs.swapspace }}'
+        name: Add Swap Space for Build
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: '${{ inputs.swapsize }}'
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          submodules: true
+      - name: Enable Kitware Repository
+        run: |
+          test -f /usr/share/doc/kitware-archive-keyring/copyright || wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
+      - name: CCACHE Shit
+        run: |
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -y update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get -y install apt-utils ccache ca-certificates gpg wget zstd
+
+          cat >> $GITHUB_ENV << 'EOF'
+          CCACHE_SLOPPINESS=locale,time_macros,random_seed,file_macro,include_file_mtime,include_file_ctime,file_stat_matches,pch_defines,clang_index_store,include_file_ctime,ivfsoverlay,modules,system_headers
+          CCACHE_NOHASHDIR=true
+          CCACHE_COMPRESS=true
+          CCACHE_COMPRESSLEVEL=18
+          CCACHE_NOFILECLONE=true
+          CCACHE_NOHARDLINK=true
+          CCACHE_INODECACHE=true
+          CCACHE_NLEVELS=4
+          CCACHE_COMPILERCHECK=content
+          CCACHE_DIRECT=true
+          EOF
+
+          # Setup CCACHE Dir
+          sudo mkdir -p /mnt/ccache
+          sudo chown -R $USER:$USER /mnt/ccache
+          echo "CCACHE_DIR=/mnt/ccache" >> $GITHUB_ENV
+          echo "CCACHE Dir Set!"
+          # Setup tarballs dir for download caching
+          #sudo mkdir -p /mnt/tarballs
+          #sudo chown -R $USER:$USER /mnt/tarballs
+          sudo mkdir -p /mnt/tarballs
+          sudo chown -R $USER:$USER /mnt/tarballs
+          df -h
+          echo "CCACHE Environment set!"
+      - name: Enable the CCACHE
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          create-symlink: 'true'
+          key: 'ccache-${{ runner.os }}-${{ matrix.target }}'
+          restore-keys: |
+            ccache-${{ runner.os }}-
+          max-size: 5000MB
+          verbose: 2
+          save: true
+      - name: Restore tarballs cache
+        uses: actions/cache/restore@v5
+        with:
+          path: /mnt/tarballs
+          key: >-
+            tarballs-${{ runner.os }}-${{ matrix.target }}-${{
+            hashFiles(format('targets/{0}/config', matrix.target)) }}
+          restore-keys: |
+            tarballs-${{ runner.os }}-${{ matrix.target }}-
+            tarballs-${{ runner.os }}-
+      - name: Enable Kitware Repository
+        run: |
+          test -f /usr/share/doc/kitware-archive-keyring/copyright || wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
+          echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
+      - if: '${{ inputs.sshserver }}'
+        name: SSH Server-ing
+        uses: valeriangalliat/action-sshd-cloudflared@v4
+      - name: Build
+        run: |
+          umask 0022
+          sudo rm -rf /opt/*
+          chmod +x ./scripts/make
+          bash ./scripts/make ${{ matrix.target }}
+      - name: Save tarballs cache
+        uses: actions/cache/save@v5
+        if: always()
+        with:
+          path: /mnt/tarballs
+          key: >-
+            tarballs-${{ runner.os }}-${{ matrix.target }}-${{
+            hashFiles(format('targets/{0}/config', matrix.target)) }}
+      - name: Upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: '${{ matrix.target }}.tar.xz'
+          path: '${{ matrix.target }}.tar.xz'
+          if-no-files-found: error
+          retention-days: 1
+      - name: Upload checksum
+        uses: actions/upload-artifact@v7
+        with:
+          name: '${{ matrix.target }}.tar.xz.sha256'
+          path: '${{ matrix.target }}.tar.xz.sha256'
+          if-no-files-found: error
+          retention-days: 1
+  release:
+    name: Release
+    runs-on: ubuntu-slim
+    needs:
+      - build
+    if: |
+      !cancelled() && github.event.inputs.make_release == 'true'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release
+          pattern: '*.tar.*'
+          merge-multiple: true
+      - name: Generate checksums
+        run: |
+          echo "| Filename | Sha256sum |" > RELEASE.md
+          echo "| -------- | --------- |" >> RELEASE.md
+          for i in release/*.sha256; do
+            echo "| $(basename $i .sha256) | $(cat $i) |" >> RELEASE.md
+          done
+      - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
+        name: Create Release
+        uses: xiechangan123/action-gh-release@master
+        with:
+          name: '${{ inputs.release_name }}'
+          tag_name: '${{ inputs.release_name }}'
+          prerelease: false
+          draft: false
+          generate_release_notes: false
+          make_latest: true
+          files: release/*-*-*.tar.*
+          body_path: RELEASE.md
+      - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
+        name: Finalize Release
+        env:
+          GH_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+        run: |
+          # The action-gh-release step above handles most files,
+          # but this ensures the body/notes are updated correctly.
+          gh release edit "${{ inputs.release_name }}" --notes-file RELEASE.md
