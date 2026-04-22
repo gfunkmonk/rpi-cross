@@ -5,7 +5,7 @@ CT_ALIAS="arm-pico-eabi-gcc"
 CT_TARGET_VENDOR="pico"
 # CT_LOG_PROGRESS_BAR is not set
 CT_ARCH_ARM=y
-CT_ARCH_CPU="cortex-m0plus"
+CT_ARCH_ARCH="cortex-m0plus"
 CT_ARCH_32=y
 # CT_ARCH_64 is not set
 CT_ARCH_FLOAT_SOFTFP=y
@@ -20,3 +20,5 @@ CT_GCC_V_15=y
 # CT_CC_GCC_ENABLE_DEFAULT_PIE is not set
 CT_BINUTILS_V_2_46=y
 CT_TOOLCHAIN_PKGVERSION="Raspberry Pi"
+CT_TARGET_CFLAGS="-mthumb"
+CT_TARGET_CFLAGS="-O2 -pipe -mthumb"

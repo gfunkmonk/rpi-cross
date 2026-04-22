@@ -55,47 +55,47 @@ make -j"$(nproc)"
 sudo make install
 popd
 
-export OPT="-O2 -pipe"
-export COMMON="-ftree-vectorize -fomit-frame-pointer"
+#export OPT="-O2 -pipe"
+#export COMMON="-ftree-vectorize -fomit-frame-pointer"
 
-case "${TARGET}" in
+#case "${TARGET}" in
     aarch64-rpi3-linux-*)
         # BCM2837 (Pi 3 / Zero 2W) Cortex-A53 does not expose the ARMv8
         # Crypto Extensions; do not emit AES/SHA instructions for this target.
-        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mcpu=cortex-a53+crc -mtune=cortex-a53 ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
-        ;;
-    aarch64-rpi4-linux-*)
-        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a72 ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
-        ;;
-    aarch64-rpi5-linux-*)
-        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a76+crc+crypto ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
-        ;;
-    armv6-rpi-linux-*)
-        export TARGET_CFLAGS="${OPT} -march=armv6zk -marm"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
-        ;;
-    armv7-rpi2-linux-*)
+#        export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mcpu=cortex-a53+crc -mtune=cortex-a53 ${COMMON}"
+#        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+#        ;;
+#    aarch64-rpi4-linux-*)
+#        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a72 ${COMMON}"
+#        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+#        ;;
+#    aarch64-rpi5-linux-*)
+#        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a76+crc+crypto ${COMMON}"
+#        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+#        ;;
+#    armv6-rpi-linux-*)
+#        export TARGET_CFLAGS="${OPT} -march=armv6zk -marm"
+#        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+#        ;;
+#    armv7-rpi2-linux-*)
         # '+neon-vfpv4' is an -mfpu value, not a valid -march extension; use
         # '+mp' as the ARMv7-a extension and keep the FPU in -mfpu=.
-        export TARGET_CFLAGS="${OPT} -march=armv7-a+neon-vfpv4+mp -marm ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
-        ;;
-    armv8-rpi3-linux-*)
-        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a53 ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
-        ;;
-    armv8-rpi4-linux-*)
-        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a72 ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
-        ;;
-    arm-pico-eabi-gcc*)
-        export TARGET_CFLAGS="${OPT} -mcpu=cortex-m0plus -mthumb"
-        export TARGET_LDFLAGS="-mthumb"
-        ;;
-esac
+#        export TARGET_CFLAGS="${OPT} -march=armv7-a+neon-vfpv4+mp -marm ${COMMON}"
+#        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+#        ;;
+#    armv8-rpi3-linux-*)
+#        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a53 ${COMMON}"
+#        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+#        ;;
+#    armv8-rpi4-linux-*)
+#        export TARGET_CFLAGS="${OPT} -mcpu=cortex-a72 ${COMMON}"
+#        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
+#        ;;
+#    arm-pico-eabi-gcc*)
+#        export TARGET_CFLAGS="${OPT} -mcpu=cortex-m0plus -mthumb"
+#        export TARGET_LDFLAGS="-mthumb"
+#        ;;
+#esac
 
 # build
 rm -rf build
