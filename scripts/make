@@ -63,15 +63,15 @@ case "${TARGET}" in
         # BCM2837 (Pi 3 / Zero 2W) Cortex-A53 does not expose the ARMv8
         # Crypto Extensions; do not emit AES/SHA instructions for this target.
         export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mcpu=cortex-a53+crc -mtune=cortex-a53 ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m64"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     aarch64-rpi4-linux-*)
         export TARGET_CFLAGS="${OPT} -march=armv8-a+crc+simd -mcpu=cortex-a72 -mtune=cortex-a72 ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m64"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     aarch64-rpi5-linux-*)
         export TARGET_CFLAGS="${OPT} -march=armv8.2-a+crc+crypto -mcpu=cortex-a76+crc+crypto -mtune=cortex-a76 ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m64"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     armv6-rpi-linux-*)
         export TARGET_CFLAGS="${OPT} -march=armv6zk -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -mfpu=vfp -mfloat-abi=hard -marm"
@@ -81,15 +81,15 @@ case "${TARGET}" in
         # '+neon-vfpv4' is an -mfpu value, not a valid -march extension; use
         # '+mp' as the ARMv7-a extension and keep the FPU in -mfpu=.
         export TARGET_CFLAGS="${OPT} -march=armv7-a+mp -mtune=cortex-a7 -mfpu=neon-vfpv4 -mfloat-abi=hard ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m32"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     armv8-rpi3-linux-*)
         export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mtune=cortex-a53 -mfpu=neon-fp-armv8 -mfloat-abi=hard ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m32"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     armv8-rpi4-linux-*)
         export TARGET_CFLAGS="${OPT} -march=armv8-a+crc -mcpu=cortex-a72 -mfpu=neon-fp-armv8 -mfloat-abi=hard ${COMMON}"
-        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed -m32"
+        export TARGET_LDFLAGS="-Wl,-O1 -Wl,--as-needed"
         ;;
     arm-pico-eabi-gcc*)
         export TARGET_CFLAGS="${OPT} -mcpu=cortex-m0plus -mthumb -mfloat-abi=soft"
