@@ -65,6 +65,7 @@ jobs:
           - armv8-rpi4-linux-gnueabihf
           - armv8-rpi4-linux-musleabihf
           - armv8-rpi4-linux-uclibcgnueabihf
+          - arm-pico-eabi-gcc
     steps:
       - if: '${{ inputs.freespace }}'
         name: Free Up Disk Space
