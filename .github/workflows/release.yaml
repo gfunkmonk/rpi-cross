@@ -198,17 +198,13 @@ jobs:
           merge-multiple: true
       - name: Generate release
         run: |
-          {
-            echo "| Filename | SHA-256 |"
-            echo "| -------- | ------- |"
-            for i in release/*.sha256; do
+          echo "| Filename | Sha256sum |" > RELEASE.md
+          echo "| -------- | --------- |" >> RELEASE.md
+          for i in release/*.sha256; do
             echo "| $(basename "$i" .sha256) | \`$(awk '{print $1}' "$i")\` |" >> RELEASE.md
-            done
-          } > RELEASE.md
-          # Aggregate hashes into a single SHA256SUMS file for easy verification
-          (cd release && cat *.sha256 > SHA256SUMS)
+          done
       - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
-        name: Create Release
+        name: Publish Release
         uses: xiechangan123/action-gh-release@master
         with:
           name: '${{ inputs.release_name }}'
