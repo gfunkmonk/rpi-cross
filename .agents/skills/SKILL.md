@@ -40,7 +40,7 @@ locally before pushing:
 
 ```sh
 shellcheck -x scripts/make scripts/lib/*.sh install.sh
-python3 -c "import yaml; [yaml.safe_load(open(f'.github/workflows/{n}')) for n in ('release.yaml','validate.yaml')]"
+python3 -c "import yaml, glob; [yaml.safe_load(open(p)) for p in glob.glob('.github/workflows/*.y*ml')]"
 # and if available:
 actionlint
 ```
