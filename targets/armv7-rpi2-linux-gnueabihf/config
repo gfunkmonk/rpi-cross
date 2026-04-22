@@ -1,9 +1,10 @@
 CT_CONFIG_VERSION="4"
 CT_EXPERIMENTAL=y
+# CT_MULTILIB is not set
 CT_PREFIX_DIR="/opt/x-tools/${CT_TARGET}"
 # CT_LOG_PROGRESS_BAR is not set
 CT_ARCH_ARM=y
-CT_ARCH_CPU="cortex-a7"
+CT_ARCH_ARCH="cortex-a7"
 CT_ARCH_SUFFIX="v7"
 CT_ARCH_FPU="neon-vfpv4"
 CT_ARCH_FLOAT_HW=y
