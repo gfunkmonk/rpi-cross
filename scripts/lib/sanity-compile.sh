@@ -58,12 +58,16 @@ esac
 
 # 3. For hard-float ABIs, the ELF note must advertise the VFP register
 #    convention; for soft-float the note must NOT advertise it.
-#    (readelf is available for the host GCC; we parse the file utility
-#    output instead to avoid depending on the target readelf.)
+#    file(1) reports "hard-float" for glibc targets, but may omit it for
+#    musl targets (which use ld-musl-armhf.so.1 as the interpreter instead).
+#    Fall back to readelf -A to check the ARM ABI attributes section directly.
 case "${TARGET}" in
     *eabihf*)
-        echo "${info}" | grep -q 'hard-float' \
-            || { echo "::error::expected hard-float ABI in $(basename "${TARGET}")"; exit 1; }
+        if ! echo "${info}" | grep -q 'hard-float'; then
+            readelf -A "${TMPDIR}/hello" 2>/dev/null \
+                | grep -q 'Tag_ABI_VFP_args.*VFP registers' \
+                || { echo "::error::expected hard-float ABI in $(basename "${TARGET}")"; exit 1; }
+        fi
         ;;
     *eabi)
         echo "${info}" | grep -q 'soft-float' \
