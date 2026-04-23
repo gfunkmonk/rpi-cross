@@ -2,6 +2,8 @@
 
 [![Release](https://github.com/gfunkmonk/rpi-cross/actions/workflows/release.yaml/badge.svg)](https://github.com/gfunkmonk/rpi-cross/actions/workflows/release.yaml)
 
+<img width="397" height="508" alt="clipart3211372" src="https://github.com/user-attachments/assets/aa2d8e1b-32e4-433a-a475-a88d7c5a18e9" />
+
 Per-model tuned cross-compilation toolchains for Raspberry Pi, built with a
 fork of [crosstool-NG](https://github.com/crosstool-ng/crosstool-ng).
 
