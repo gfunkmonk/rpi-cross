@@ -46,8 +46,9 @@ popd
 sudo mkdir -p /opt
 sudo chown 0777 /opt
 #if command -v ct-ng > /dev/null 2>&1; then
-  CT_BIN=$(command -v ct-ng || true)
-  export CT_BIN
+  if CT_BIN=$(command -v ct-ng); then
+      export CT_BIN
+  fi
 #else
   sudo rm -rf /opt/ct-ng
   pushd builder
