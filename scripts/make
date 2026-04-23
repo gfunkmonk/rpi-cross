@@ -86,7 +86,13 @@ sudo mv /opt/x-tools/"${TARGET}" .
 sudo chown -R root:root "${TARGET}"
 
 # das hinterhältig
-REAL_TARGET=$(ls -d "${TARGET}"/arm-linaro-*/ 2>/dev/null | head -n 1)
+REAL_TARGET=
+shopt -s nullglob
+for d in "${TARGET}"/arm-linaro-*/; do
+    REAL_TARGET=$d
+    break
+done
+shopt -u nullglob
 if [ -d "$REAL_TARGET" ]; then
     pushd "$TARGET" >/dev/null
     sudo ln -sf "${REAL_TARGET}" "${TARGET}"
@@ -95,7 +101,7 @@ fi
 
 # The old sneaky pete
 TARGET_BIN="${REAL_TARGET}/bin"
-if [ -d "$TARGET_BIN" ]; then
+if [ -n "$REAL_TARGET" ] && [ -d "$TARGET_BIN" ]; then
     echo "Doing the mold to gold switch-a-roo"
     # We MUST jump in so the symlink is relative ("naked")
     pushd "$TARGET_BIN" >/dev/null
