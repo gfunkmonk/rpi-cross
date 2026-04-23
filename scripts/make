@@ -81,9 +81,18 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 sudo mv /opt/x-tools/"${TARGET}" .
 sudo chown -R root:root "${TARGET}"
 
+# das hinterhältig
+REAL_TARGET=$(ls -d "${TARGET}"/arm-linaro-*/ 2>/dev/null | head -n 1)
+if [ -d "$REAL_TARGET" ]; then
+    pushd "$TARGET" >/dev/null
+    sudo ln -sf "${REAL_TARGET}" "${TARGET}"
+    popd >/dev/null
+fi
+
 # The old sneaky pete
-TARGET_BIN=$(ls -d "${TARGET}"/arm-linaro-*/bin 2>/dev/null | head -n 1)
+TARGET_BIN="${REAL_TARGET}/bin"
 if [ -d "$TARGET_BIN" ]; then
+
     echo "Doing the mold to gold switch-a-roo"
     # We MUST jump in so the symlink is relative ("naked")
     pushd "$TARGET_BIN" >/dev/null
