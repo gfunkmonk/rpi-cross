@@ -23,5 +23,5 @@ CT_CC_LANG_CXX=y
 CT_LINKER_MOLD=y
 CT_GCC_V_15=y
 CT_BINUTILS_V_2_46=y
-CT_TARGET_CFLAGS="-O3 -pipe -ftree-vectorize -fomit-frame-pointer -marm -mfloat-abi=hard"
-CT_TARGET_LDFLAGS="-s -w"
+CT_TARGET_CFLAGS="-O2 -pipe -ftree-vectorize -fomit-frame-pointer -ffunction-sections -fdata-sections -marm -mfloat-abi=hard"
+CT_TARGET_LDFLAGS="-Wl,--gc-sections -Wl,-O1 -Wl,--as-needed -s -w"
