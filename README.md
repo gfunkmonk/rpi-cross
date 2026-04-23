@@ -1,8 +1,20 @@
 # rpi-cross
 
 [![Release](https://github.com/gfunkmonk/rpi-cross/actions/workflows/release.yaml/badge.svg)](https://github.com/gfunkmonk/rpi-cross/actions/workflows/release.yaml)
+<img align="left" width="262" height="335" alt="clipart3211372-1" src="https://github.com/user-attachments/assets/33d6a411-8462-40ef-a495-eca9487e18e7" />
 
-<img width="397" height="508" alt="clipart3211372" src="https://github.com/user-attachments/assets/aa2d8e1b-32e4-433a-a475-a88d7c5a18e9" />
+
+| Component | Version |   
+| --------- | ------- |
+| GCC       | 15      |
+| binutils  | 2.46    |
+| Linux headers | 6.18 |
+| glibc     | 2.43    |
+| musl      | 1.2.6   |
+| uClibc-ng | 1.0.57  |
+| Linker    | mold (default) |
+
+
 
 Per-model tuned cross-compilation toolchains for Raspberry Pi, built with a
 fork of [crosstool-NG](https://github.com/crosstool-ng/crosstool-ng).
@@ -22,17 +34,6 @@ into the default specs.
 | Pi 3 / Zero 2W              | 64 | `aarch64-rpi3-linux-*`     | `gnu`, `musl`, `uclibc`                      |
 | Pi 4 / CM4                  | 64 | `aarch64-rpi4-linux-*`     | `gnu`, `musl`, `uclibc`                      |
 | Pi 5                        | 64 | `aarch64-rpi5-linux-*`     | `gnu`, `musl`, `uclibc`                      |
-## Versions
-
-| Component | Version |
-| --------- | ------- |
-| GCC       | 15      |
-| binutils  | 2.46    |
-| Linux headers | 6.18 |
-| glibc     | 2.43    |
-| musl      | 1.2.6   |
-| uClibc-ng | 1.0.57  |
-| Linker    | mold (default) |
 
 ## Miscellaneous
 | Type     | Bits | Triple                             | Notes
@@ -43,7 +44,6 @@ into the default specs.
 | linaro musl                         | 32 | `arm-linaro-musl`           | `Linaro GCC 7.4-2019.02`                     |
 | linaro gnu                         | 32 | `arm-linaro-gnu`           | `Linaro GCC 7.4-2019.02`                     |
 | linaro uclibc-ng                         | 32 | `arm-linaro-uclibc`           | `Linaro GCC 7.4-2019.02`                     |
-
 
 ## Install (prebuilt tarballs)
 
