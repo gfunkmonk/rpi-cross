@@ -20,6 +20,10 @@ into the default specs.
 | Pi 3 / Zero 2W              | 64 | `aarch64-rpi3-linux-*`     | `gnu`, `musl`, `uclibc`                      |
 | Pi 4 / CM4                  | 64 | `aarch64-rpi4-linux-*`     | `gnu`, `musl`, `uclibc`                      |
 | Pi 5                        | 64 | `aarch64-rpi5-linux-*`     | `gnu`, `musl`, `uclibc`                      |
+----------------------------------------------------------------------------------------------------------------
+| Pi Pico			| 32 | `armv6m-pico-eabi`	    | built with `picolib`			 |
+| Pi Pico2		| 32 | `armv8m-pico-eabi`	    | built with `picolib`			 |
+| Beagle Bone Black		| 32 | `armv7-beaglebone-linux-*` | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
 
 ## Versions
 
