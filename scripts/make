@@ -15,12 +15,17 @@ if [[ ! -d "targets/${TARGET}" ]]; then
     exit 1
 fi
 
+# Enable Kitware repo
+test -f /usr/share/keyrings/kitware-archive-keyring.gpg || { wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null; }
+echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
+
 # packages
-sudo apt update -qy && sudo apt install -y         \
-  --no-install-recommends automake build-essential \
-  bzip2 cmake curl bison flex gawk gdb git gperf   \
-  help2man libncurses-dev libssl-dev libtool-bin   \
-  libzstd-dev pkg-config python3 rsync texinfo     \
+sudo DEBIAN_FRONTEND=noninteractive apt-get update -qy
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y  \
+  --no-install-recommends automake build-essential      \
+  bzip2 cmake curl bison flex gawk gdb git gperf        \
+  help2man libncurses-dev libssl-dev libtool-bin        \
+  libzstd-dev pkg-config python3 rsync texinfo          \
   unzip wget xz-utils
 
 # patch
@@ -56,7 +61,6 @@ echo 'CT_SAVE_TARBALLS=y' >> build/.config
 
 pushd build
 /opt/ct-ng/bin/ct-ng olddefconfig
-# shellcheck disable=SC2086 # intentional word-splitting of EXTRA_CT_NG_ARGS
 /opt/ct-ng/bin/ct-ng build."$(nproc)"
 popd
 
