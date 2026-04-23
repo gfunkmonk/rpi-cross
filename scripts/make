@@ -45,9 +45,9 @@ popd
 # crosstool-ng
 sudo mkdir -p /opt
 sudo chown 0777 /opt
-if command -v ct-ng > /dev/null 2>&1; then
+#if command -v ct-ng > /dev/null 2>&1; then
   export CT_BIN=$(command -v ct-ng)
-else
+#else
   sudo rm -rf /opt/ct-ng
   pushd builder
   ./bootstrap
@@ -56,7 +56,7 @@ else
   sudo make install
   export CT_BIN="/opt/ct-ng/bin/ct-ng"
   popd
-fi
+#fi
 
 # build
 rm -rf build
