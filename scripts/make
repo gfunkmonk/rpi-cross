@@ -81,6 +81,26 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # tarball
 sudo mv /opt/x-tools/"${TARGET}" .
 sudo chown -R root:root "${TARGET}"
+
+# The old sneaky pete
+TARGET_BIN=$(ls -d "${TARGET}"/arm-linaro-*/bin 2>/dev/null | head -n 1)
+if [ -d "$TARGET_BIN" ]; then
+    # We MUST jump in so the symlink is relative ("naked")
+    pushd "$TARGET_BIN" > /dev/null
+
+    # Create the naked, relative symlink
+    if [ -f "mold" ]; then
+        sudo ln -sf mold ld.gold
+        echo "[SUCCESS] Internal ld.gold -> mold link secured in ${TARGET_BIN}"
+    else
+        echo "[ERROR] mold binary not found in $TARGET_BIN"
+    fi
+    # There's no place like home, toto.
+    popd > /dev/null
+else
+    echo "[SKIP] Target directory not found. Check your tuple naming."
+fi
+
 sudo tar --sort=name --owner=0 --group=0 --numeric-owner \
     -I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
 sha256sum "${TARGET}".tar.xz > "${TARGET}".tar.xz.sha256
