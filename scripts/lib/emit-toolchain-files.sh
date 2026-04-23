@@ -41,18 +41,23 @@ esac
 
 MESON_CPU="${ARCH_CPU:-${CMAKE_PROCESSOR}}"
 
-# Linux targets have <PREFIX>/<TARGET>/sysroot; bare-metal (pico, *-eabi / *-eabihf
-# without -linux-) do not and require CMAKE_SYSTEM_NAME=Generic / Meson system='none'.
+# Linux targets have <PREFIX>/<TARGET>/sysroot; bare-metal (pico, *-eabi / *-eabihf)
+# do not and require CMAKE_SYSTEM_NAME=Generic / Meson system='none'. Unknown
+# OS/ABI triples are a hard error rather than silently emitting Pico-style files.
 case "${TARGET}" in
     *-linux-*)
         CMAKE_SYSTEM_NAME=Linux
         MESON_SYSTEM=linux
         BARE_METAL=0
         ;;
-    *)
+    *-eabi|*-eabihf)
         CMAKE_SYSTEM_NAME=Generic
         MESON_SYSTEM=none
         BARE_METAL=1
+        ;;
+    *)
+        echo "Unknown target OS/ABI for ${TARGET}" >&2
+        exit 1
         ;;
 esac
 
@@ -64,8 +69,12 @@ if [[ "${BARE_METAL}" -eq 0 ]]; then
 sys_root  = '${PREFIX}/${TARGET}/sysroot'
 "
 else
-    # No Linux-style sysroot for bare-metal; cmake's try_compile must skip link.
-    CMAKE_SYSROOT_LINE="set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)"
+    # No Linux-style sysroot for bare-metal; cmake's try_compile must skip link,
+    # and we still need to scope find_{library,path,package} (which we set to
+    # ONLY below) to the toolchain prefix so downstream projects can resolve
+    # headers and libraries shipped inside the toolchain.
+    CMAKE_SYSROOT_LINE="set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
+set(CMAKE_FIND_ROOT_PATH        ${PREFIX}/${TARGET})"
     MESON_SYSROOT_BLOCK=""
 fi
 

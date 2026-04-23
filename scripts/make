@@ -19,13 +19,14 @@ fi
 test -f /usr/share/keyrings/kitware-archive-keyring.gpg || { wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null; }
 echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
 
-# packages
-export DEBIAN_FRONTEND=noninteractive
-sudo apt-get update -qy && sudo apt-get install -y  \
-  --no-install-recommends automake build-essential  \
-  bzip2 cmake curl bison flex gawk gdb git gperf    \
-  help2man libncurses-dev libssl-dev libtool-bin    \
-  libzstd-dev pkg-config python3 rsync texinfo      \
+# packages — pass DEBIAN_FRONTEND through sudo explicitly; a plain `export`
+# would not reach the sudoed apt-get because sudo resets the environment.
+sudo DEBIAN_FRONTEND=noninteractive apt-get update -qy && \
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  --no-install-recommends automake build-essential   \
+  bzip2 cmake curl bison flex gawk gdb git gperf     \
+  help2man libncurses-dev libssl-dev libtool-bin     \
+  libzstd-dev pkg-config python3 rsync texinfo       \
   unzip wget xz-utils
 
 # patch

@@ -37,13 +37,23 @@ C
 # Linux-style sysroot and need extra link-time options (--specs=picolibc.specs,
 # a linker script, etc.) that this generic smoke test can't supply. For those
 # we only verify that the compiler can produce a valid object file for the
-# expected architecture.
+# expected architecture — and we use a freestanding source (no <stdio.h>, no
+# library calls) so missing hosted-libc headers don't give a false negative.
 case "${TARGET}" in
     *-linux-*) BARE_METAL=0 ;;
     *)         BARE_METAL=1 ;;
 esac
 
-"${GCC}" -c "${TMPDIR}/hello.c" -o "${TMPDIR}/hello.o"
+if [[ "${BARE_METAL}" -eq 1 ]]; then
+    cat > "${TMPDIR}/hello_freestanding.c" <<'C'
+int main(void) {
+    return 0;
+}
+C
+    "${GCC}" -c "${TMPDIR}/hello_freestanding.c" -o "${TMPDIR}/hello.o"
+else
+    "${GCC}" -c "${TMPDIR}/hello.c" -o "${TMPDIR}/hello.o"
+fi
 
 if [[ "${BARE_METAL}" -eq 1 ]]; then
     info=$(file "${TMPDIR}/hello.o")
