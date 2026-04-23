@@ -18,9 +18,11 @@ jobs:
           fetch-depth: 1
 
       - name: Install shellcheck
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          DEBIAN_FRONTEND=noninteractive sudo apt-get -y update
-          DEBIAN_FRONTEND=noninteractive sudo apt-get -y install shellcheck
+          sudo -E apt-get -y update
+          sudo -E apt-get -y install shellcheck
 
       - name: shellcheck scripts/make
         run: shellcheck -x scripts/make
