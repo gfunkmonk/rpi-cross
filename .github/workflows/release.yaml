@@ -122,7 +122,7 @@ jobs:
             inode_cache=true
             recache=false
             direct_mode=true
-            nlevels=4
+            depend_mode=false
             compiler_check=content
       - name: Tarballs Cache (Shared)
         uses: actions/cache@v5 # Use the combined save/restore action
