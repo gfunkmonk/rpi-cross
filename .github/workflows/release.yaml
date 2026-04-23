@@ -111,7 +111,7 @@ jobs:
           install_ccache: false
           prepend_symlinks_to_path: true
           ccache_options: |
-            max_size=10000M
+            max_size=5000M
             cache_dir=/mnt/ccache
             compression=true
             compression_level=16
