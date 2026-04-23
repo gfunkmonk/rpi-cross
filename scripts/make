@@ -70,8 +70,7 @@ popd
 
 # Emit CMake   Meson cross files into the prefix before we tar it up.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-"${SCRIPT_DIR}/lib/emit-toolchain-files.sh"
-"${TARGET}" "/opt/x-tools/${TARGET}" "targets/${TARGET}/config"
+"${SCRIPT_DIR}/lib/emit-toolchain-files.sh" "${TARGET}" "/opt/x-tools/${TARGET}" "targets/${TARGET}/config"
 
 # Smoke-test: hello-world must compile and produce a binary of the
 # expected architecture/ABI. Cheap gate that catches CFLAGS/config

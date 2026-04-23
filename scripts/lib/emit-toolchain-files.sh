@@ -29,7 +29,7 @@ case "${TARGET}" in
         MESON_CPU_FAMILY=aarch64
         CMAKE_PROCESSOR=aarch64
         ;;
-    armv*-*)
+    arm-*|armv[4-8]*-*)
         MESON_CPU_FAMILY=arm
         CMAKE_PROCESSOR=arm
         ;;
