@@ -20,13 +20,17 @@ test -f /usr/share/keyrings/kitware-archive-keyring.gpg || { wget -O - https://a
 echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
 
 # packages
-sudo DEBIAN_FRONTEND=noninteractive apt-get update -qy
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y  \
-  --no-install-recommends automake build-essential      \
-  bzip2 cmake curl bison flex gawk gdb git gperf        \
-  help2man libncurses-dev libssl-dev libtool-bin        \
-  libzstd-dev pkg-config python3 rsync texinfo          \
-  unzip wget xz-utils
+export DEBIAN_FRONTEND=noninteractive
+
+PACKAGES=(
+  automake bison build-essential bzip2 cmake curl 
+  flex gawk gdb git gperf help2man libncurses-dev 
+  libssl-dev libtool-bin libzstd-dev pkg-config 
+  python3 rsync texinfo unzip wget xz-utils
+)
+
+sudo -E apt-get update -qy
+sudo -E apt-get install -y --no-install-recommends "${PACKAGES[@]}"
 
 # patch
 pushd builder
