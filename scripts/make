@@ -44,7 +44,11 @@ popd
 
 # crosstool-ng
 sudo mkdir -p /opt
-sudo chown 0777 /opt
+# ct-ng later writes /opt/x-tools/<triple>/ without sudo, so /opt must be
+# world-writable on the CI runner. The previous 'chown 0777 /opt' was a typo
+# for chmod — chown parsed 0777 as a numeric UID, leaving the directory
+# unwritable by the build user.
+sudo chmod 0777 /opt
 #if command -v ct-ng > /dev/null 2>&1; then
   export CT_BIN=$(command -v ct-ng)
 #else
