@@ -212,7 +212,7 @@ jobs:
           done
       - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
         name: Publish Release
-        uses: softprops/action-gh-release@v2
+        uses: xiechangan123/action-gh-release@master
         with:
           name: '${{ inputs.release_name }}'
           tag_name: '${{ inputs.release_name }}'
