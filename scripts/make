@@ -23,10 +23,10 @@ echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://ap
 export DEBIAN_FRONTEND=noninteractive
 
 PACKAGES=(
-  automake bison build-essential bzip2 cmake curl 
-  flex gawk gdb git gperf help2man libncurses-dev 
-  libssl-dev libtool-bin libzstd-dev pkg-config 
-  python3 rsync texinfo unzip wget xz-utils
+    automake bison build-essential bzip2 cmake curl
+    flex gawk gdb git gperf help2man libncurses-dev
+    libssl-dev libtool-bin libzstd-dev pkg-config
+    python3 rsync texinfo unzip wget xz-utils
 )
 
 sudo -E apt-get update -qy
@@ -60,18 +60,18 @@ mkdir -p build
 cp targets/"${TARGET}"/config build/.config
 
 # Configure tarballs directory for download caching
-echo 'CT_LOCAL_TARBALLS_DIR="/mnt/tarballs"' >> build/.config
-echo 'CT_SAVE_TARBALLS=y' >> build/.config
+echo 'CT_LOCAL_TARBALLS_DIR="/mnt/tarballs"' >>build/.config
+echo 'CT_SAVE_TARBALLS=y' >>build/.config
 
 pushd build
 /opt/ct-ng/bin/ct-ng olddefconfig
 /opt/ct-ng/bin/ct-ng build."$(nproc)"
 popd
 
-# Emit CMake + Meson cross files into the prefix before we tar it up.
+# Emit CMake   Meson cross files into the prefix before we tar it up.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-"${SCRIPT_DIR}/lib/emit-toolchain-files.sh" \
-    "${TARGET}" "/opt/x-tools/${TARGET}" "targets/${TARGET}/config"
+"${SCRIPT_DIR}/lib/emit-toolchain-files.sh"
+"${TARGET}" "/opt/x-tools/${TARGET}" "targets/${TARGET}/config"
 
 # Smoke-test: hello-world must compile and produce a binary of the
 # expected architecture/ABI. Cheap gate that catches CFLAGS/config
@@ -87,7 +87,7 @@ TARGET_BIN=$(ls -d "${TARGET}"/arm-linaro-*/bin 2>/dev/null | head -n 1)
 if [ -d "$TARGET_BIN" ]; then
     echo "Doing the mold to gold switch-a-roo"
     # We MUST jump in so the symlink is relative ("naked")
-    pushd "$TARGET_BIN" > /dev/null
+    pushd "$TARGET_BIN" >/dev/null
 
     # Create the naked, relative symlink
     if [ -f "mold" ]; then
@@ -97,12 +97,12 @@ if [ -d "$TARGET_BIN" ]; then
         echo "[ERROR] mold binary not found in $TARGET_BIN"
     fi
     # There's no place like home, toto.
-    popd > /dev/null
+    popd >/dev/null
 else
     echo "[SKIP] linker hack isn't needed"
 fi
 
 # tarball
-sudo tar --sort=name --owner=0 --group=0 --numeric-owner \
-    -I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
-sha256sum "${TARGET}".tar.xz > "${TARGET}".tar.xz.sha256
+sudo tar --sort=name --owner=0 --group=0 --numeric-owner
+-I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
+sha256sum "${TARGET}".tar.xz >"${TARGET}".tar.xz.sha256

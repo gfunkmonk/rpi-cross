@@ -40,8 +40,17 @@ C
 # expected architecture — and we use a freestanding source (no <stdio.h>, no
 # library calls) so missing hosted-libc headers don't give a false negative.
 case "${TARGET}" in
-    *-linux-*) BARE_METAL=0 ;;
-    *)         BARE_METAL=1 ;;
+    *-linux-*|*-musl*|*-uclibc*|*-gnu*)
+        BARE_METAL=0
+        ;;
+    *-none-*|*-elf*|*-eabi*)
+        BARE_METAL=1
+        ;;
+    *)
+        # Default fallback: if it doesn't look like a standard OS,
+        # treat it as bare-metal to be safe.
+        BARE_METAL=1
+        ;;
 esac
 
 if [[ "${BARE_METAL}" -eq 1 ]]; then
