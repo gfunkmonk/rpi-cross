@@ -93,9 +93,11 @@ jobs:
           fetch-depth: 1
           submodules: true
       - name: CCACHE Stuff
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y update
-          sudo DEBIAN_FRONTEND=noninteractive apt-get -y install apt-utils ccache ca-certificates gpg wget zstd
+          sudo -E apt-get -y update
+          sudo -E apt-get -y install apt-utils ccache ca-certificates gpg wget zstd
 
           cat >> $GITHUB_ENV << 'EOF'
           CCACHE_SLOPPINESS=locale,time_macros,random_seed,file_macro,include_file_mtime,include_file_ctime,file_stat_matches,pch_defines,clang_index_store,ivfsoverlay,modules,system_headers
