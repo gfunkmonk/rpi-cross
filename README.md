@@ -32,7 +32,8 @@ into the default specs.
 | uClibc-ng | 1.0.57  |
 | Linker    | mold (default) |
 
-| Miscellaneous     | Bits | Triple                             | Notes
+## Miscellaneous
+| Type     | Bits | Triple                             | Notes
 | ------------------| ---- | ---------------------------------- | ---------------------------------------------|
 | Pi Pico			       | 32 | `armv6m-pico-eabi`	    | built with `picolib`			 |
 | Pi Pico2		       | 32 | `armv8m-pico-eabi`	    | built with `picolib`			 |
