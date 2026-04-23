@@ -113,6 +113,5 @@ else
 fi
 
 # tarball
-sudo tar --sort=name --owner=0 --group=0 --numeric-owner \
-    -I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
+sudo tar --sort=name --owner=0 --group=0 --numeric-owner -I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
 sha256sum "${TARGET}".tar.xz >"${TARGET}".tar.xz.sha256
