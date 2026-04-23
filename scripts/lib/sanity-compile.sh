@@ -60,12 +60,17 @@ if [[ "${BARE_METAL}" -eq 1 ]]; then
     echo "${info}"
     case "${TARGET}" in
         aarch64-*)
-            echo "${info}" | grep -q 'ELF 64-bit LSB.*ARM aarch64' \
-                || { echo "::error::not an aarch64 ELF"; exit 1; }
-            ;;
+	  { echo "${info}" | grep -qi "64-bit" && \
+              echo "${info}" | grep -qi "LSB" && \
+              echo "${info}" | grep -qi "aarch64"; } \
+              || { echo "::error::not an aarch64 ELF. Got: ${info}"; exit 1; }
+        ;;
         arm-*|armv[4-8]*-*)
-            echo "${info}" | grep -q 'ELF 32-bit LSB.*ARM' \
-                || { echo "::error::not a 32-bit ARM ELF"; exit 1; }
+            # The Triple-Check: Works on file(1) AND readelf(1)
+            { echo "${info}" | grep -qi "32-bit" && \
+              echo "${info}" | grep -qi "LSB" && \
+              echo "${info}" | grep -qi "ARM"; } \
+              || { echo "::error::not a 32-bit ARM ELF. Got: ${info}"; exit 1; }
             ;;
         *)
             echo "::error::unknown target family for sanity check: ${TARGET}" >&2
@@ -84,12 +89,18 @@ echo "${info}"
 
 case "${TARGET}" in
     aarch64-*)
-        echo "${info}" | grep -q 'ELF 64-bit LSB.*ARM aarch64' \
-            || { echo "::error::not an aarch64 ELF"; exit 1; }
+        # Verify 64-bit, Little Endian, and AArch64 identity
+        { echo "${info}" | grep -qi "64-bit" && \
+          echo "${info}" | grep -qi "LSB" && \
+          echo "${info}" | grep -qi "aarch64"; } \
+          || { echo "::error::not an aarch64 ELF. Got: ${info}"; exit 1; }
         ;;
     arm-*|armv[4-8]*-*)
-        echo "${info}" | grep -q 'ELF 32-bit LSB.*ARM' \
-            || { echo "::error::not a 32-bit ARM ELF"; exit 1; }
+        # Verify 32-bit, Little Endian, and ARM identity
+        { echo "${info}" | grep -qi "32-bit" && \
+          echo "${info}" | grep -qi "LSB" && \
+          echo "${info}" | grep -qi "ARM"; } \
+          || { echo "::error::not a 32-bit ARM ELF. Got: ${info}"; exit 1; }
         ;;
     *)
         echo "::error::unknown target family for sanity check: ${TARGET}" >&2

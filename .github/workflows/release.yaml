@@ -70,6 +70,9 @@ jobs:
           - armv7-beaglebone-linux-gnueabihf
           - armv7-beaglebone-linux-musleabihf
           - armv7-beaglebone-linux-uclibcgnueabihf
+          - arm-linaro-gnu
+          - arm-linaro-musl
+          - arm-linaro-uclibc
     steps:
       - if: '${{ inputs.freespace }}'
         name: Free Up Disk Space
