@@ -87,7 +87,7 @@ case "${TARGET}" in
         echo "${info}" | grep -q 'ELF 64-bit LSB.*ARM aarch64' \
             || { echo "::error::not an aarch64 ELF"; exit 1; }
         ;;
-    armv6-*|armv6m-*|armv7-*|armv8m-*|armv8-*)
+    arm-*|armv[4-8]*-*)
         echo "${info}" | grep -q 'ELF 32-bit LSB.*ARM' \
             || { echo "::error::not a 32-bit ARM ELF"; exit 1; }
         ;;
