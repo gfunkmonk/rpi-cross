@@ -23,7 +23,7 @@ if [[ ! -x "${GCC}" ]]; then
 fi
 
 TMPDIR=$(mktemp -d)
-trap 'rm -rf "${TMPDIR}"' EXIT
+trap 'rm -rf "${TMPDIR}" 2>/dev/null || true' EXIT
 
 cat > "${TMPDIR}/hello.c" <<'C'
 #include <stdio.h>
