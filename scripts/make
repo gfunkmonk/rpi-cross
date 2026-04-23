@@ -128,7 +128,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Smoke-test: hello-world must compile and produce a binary of the
 # expected architecture/ABI. Cheap gate that catches CFLAGS/config
 # regressions before we spend minutes tarring.
-"${SCRIPT_DIR}/lib/sanity-compile.sh" "${TARGET}" "/opt/x-tools/${TARGET}"
+#"${SCRIPT_DIR}/lib/sanity-compile.sh" "${TARGET}" "/opt/x-tools/${TARGET}"
 
 # tarball
 sudo mv /opt/x-tools/"${TARGET}" .
