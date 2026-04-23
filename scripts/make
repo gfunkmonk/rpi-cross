@@ -46,7 +46,7 @@ popd
 sudo mkdir -p /opt
 sudo chown 0777 /opt
 #if command -v ct-ng > /dev/null 2>&1; then
-  CT_BIN=$(command -v ct-ng)
+  CT_BIN=$(command -v ct-ng || true)
   export CT_BIN
 #else
   sudo rm -rf /opt/ct-ng
@@ -88,16 +88,20 @@ sudo chown -R root:root "${TARGET}"
 
 # das hinterhältig
 REAL_TARGET=
+_prev_nullglob=$(shopt -p nullglob || true)
 shopt -s nullglob
 for d in "${TARGET}"/arm-linaro-*/; do
     REAL_TARGET=$d
     break
 done
-shopt -u nullglob
+eval "$_prev_nullglob"
+unset _prev_nullglob
 if [ -d "$REAL_TARGET" ]; then
     pushd "$TARGET" >/dev/null
     sudo ln -sf "${REAL_TARGET}" "${TARGET}"
     popd >/dev/null
+else
+    echo "[INFO] linker hack: no arm-linaro-*/ dir under ${TARGET}/, skipping"
 fi
 
 # The old sneaky pete
