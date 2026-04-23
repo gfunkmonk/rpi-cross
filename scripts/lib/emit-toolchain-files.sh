@@ -45,7 +45,7 @@ MESON_CPU="${ARCH_CPU:-${CMAKE_PROCESSOR}}"
 # do not and require CMAKE_SYSTEM_NAME=Generic / Meson system='none'. Unknown
 # OS/ABI triples are a hard error rather than silently emitting Pico-style files.
 case "${TARGET}" in
-    *-linux-*)
+    *-linux-*|*-musl*|*-uclibc*|*-gnu*)
         CMAKE_SYSTEM_NAME=Linux
         MESON_SYSTEM=linux
         BARE_METAL=0
