@@ -1,8 +1,9 @@
 CT_CONFIG_VERSION="4"
 CT_EXPERIMENTAL=y
+CT_TARGET_ALIAS="arm-linaro-linux-musl"
 CT_ALLOW_BUILD_AS_ROOT=y
 CT_ALLOW_BUILD_AS_ROOT_SURE=y
-CT_PREFIX_DIR="/opt/x-tools/${CT_TARGET}"
+CT_PREFIX_DIR="/opt/x-tools/arm-linaro-linux-musl"
 # CT_LOG_PROGRESS_BAR is not set
 CT_ARCH_ARM=y
 # CT_ARCH_ARCH is not set
