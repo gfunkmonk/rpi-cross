@@ -33,6 +33,16 @@ EOF
 TARGET=$1
 RELEASE=${2:-}
 
+# Guard against path-traversal / shell-metachar surprises: TARGET is
+# interpolated into rm -rf, tar -C, URLs and PATH snippets below, so
+# constrain it to the same character set the repo's target dirs use.
+case "${TARGET}" in
+    *[!A-Za-z0-9._-]*|*..*|/*|'')
+        echo "install.sh: invalid target '${TARGET}'" >&2
+        exit 2
+        ;;
+esac
+
 have() { command -v "$1" >/dev/null 2>&1; }
 have curl || { echo "install.sh: curl is required" >&2; exit 1; }
 have tar || { echo "install.sh: tar is required" >&2; exit 1; }
