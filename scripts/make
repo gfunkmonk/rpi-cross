@@ -106,8 +106,8 @@ else
 fi
 
 # The old sneaky pete
-TARGET_BIN="${REAL_TARGET}/bin"
-if [ -n "$REAL_TARGET" ] && [ -d "$TARGET_BIN" ]; then
+if [ -n "$REAL_TARGET" ] && [ -d "${REAL_TARGET}/bin" ]; then
+    TARGET_BIN="${REAL_TARGET}/bin"
     echo "Doing the mold to gold switch-a-roo"
     # We MUST jump in so the symlink is relative ("naked")
     pushd "$TARGET_BIN" >/dev/null
