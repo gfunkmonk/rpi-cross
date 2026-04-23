@@ -26,9 +26,9 @@ TMPDIR=$(mktemp -d)
 #trap 'rm -rf "${TMPDIR}" 2>/dev/null || true' EXIT
 trap 'rm -rf "${TMPDIR}" 2>/dev/null || :' EXIT
 
-trap - EXIT  # This clears the trap
-rm -rf "${TMPDIR}"
-exit 0
+#trap - EXIT  # This clears the trap
+#rm -rf "${TMPDIR}"
+#exit 0
 
 cat > "${TMPDIR}/hello.c" <<'C'
 #include <stdio.h>
@@ -38,12 +38,6 @@ int main(void) {
 }
 C
 
-# Bare-metal targets (e.g. the Pi Pico *-eabi / *-eabihf triples) don't have a
-# Linux-style sysroot and need extra link-time options (--specs=picolibc.specs,
-# a linker script, etc.) that this generic smoke test can't supply. For those
-# we only verify that the compiler can produce a valid object file for the
-# expected architecture — and we use a freestanding source (no <stdio.h>, no
-# library calls) so missing hosted-libc headers don't give a false negative.
 case "${TARGET}" in
     *-linux-*|*-musl*|*-uclibc*|*-gnu*)
         BARE_METAL=0
@@ -52,8 +46,6 @@ case "${TARGET}" in
         BARE_METAL=1
         ;;
     *)
-        # Default fallback: if it doesn't look like a standard OS,
-        # treat it as bare-metal to be safe.
         BARE_METAL=1
         ;;
 esac
@@ -78,7 +70,7 @@ if [[ "${BARE_METAL}" -eq 1 ]]; then
               echo "${info}" | grep -qi "LSB" && \
               echo "${info}" | grep -qi "aarch64"; } \
               || { echo "::error::not an aarch64 ELF. Got: ${info}"; exit 1; }
-        ;;
+            ;;
         arm-*|armv[4-8]*-*)
             # The Triple-Check: Works on file(1) AND readelf(1)
             { echo "${info}" | grep -qi "32-bit" && \
@@ -122,11 +114,6 @@ case "${TARGET}" in
         ;;
 esac
 
-# For hard-float ABIs, the ELF note must advertise the VFP register
-# convention; for soft-float the note must NOT advertise it.
-# file(1) reports "hard-float" for glibc targets, but may omit it for
-# musl targets (which use ld-musl-armhf.so.1 as the interpreter instead).
-# Fall back to readelf -A to check the ARM ABI attributes section directly.
 case "${TARGET}" in
     *eabihf*)
         if ! echo "${info}" | grep -q 'hard-float'; then

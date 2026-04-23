@@ -68,6 +68,7 @@ if [[ "${BARE_METAL}" -eq 0 ]]; then
     MESON_SYSROOT_BLOCK="[properties]
 sys_root  = '${PREFIX}/${TARGET}/sysroot'
 "
+
 else
     # No Linux-style sysroot for bare-metal; cmake's try_compile must skip link,
     # and we still need to scope find_{library,path,package} (which we set to

@@ -21,7 +21,6 @@ echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://ap
 
 # packages
 export DEBIAN_FRONTEND=noninteractive
-
 PACKAGES=(
     automake bison build-essential bzip2 cmake curl
     flex gawk gdb git gperf help2man libncurses-dev
@@ -92,11 +91,9 @@ fi
 # The old sneaky pete
 TARGET_BIN="${REAL_TARGET}/bin"
 if [ -d "$TARGET_BIN" ]; then
-
     echo "Doing the mold to gold switch-a-roo"
     # We MUST jump in so the symlink is relative ("naked")
     pushd "$TARGET_BIN" >/dev/null
-
     # Create the naked, relative symlink
     if [ -f "mold" ]; then
         sudo ln -sf mold ld.gold
@@ -111,6 +108,6 @@ else
 fi
 
 # tarball
-sudo tar --sort=name --owner=0 --group=0 --numeric-owner
--I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
+sudo tar --sort=name --owner=0 --group=0 --numeric-owner \
+    -I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
 sha256sum "${TARGET}".tar.xz >"${TARGET}".tar.xz.sha256
