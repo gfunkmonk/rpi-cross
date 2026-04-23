@@ -98,40 +98,32 @@ jobs:
         run: |
           sudo -E apt-get -y update
           sudo -E apt-get -y install apt-utils ccache ca-certificates gpg wget zstd
-
-          cat >> $GITHUB_ENV << 'EOF'
-          CCACHE_SLOPPINESS=locale,time_macros,random_seed,file_macro,include_file_mtime,include_file_ctime,file_stat_matches,pch_defines,clang_index_store,ivfsoverlay,modules,system_headers
-          CCACHE_NOHASHDIR=true
-          CCACHE_COMPRESS=true
-          CCACHE_COMPRESSLEVEL=18
-          CCACHE_NOFILECLONE=true
-          CCACHE_NOHARDLINK=true
-          CCACHE_INODECACHE=true
-          CCACHE_NLEVELS=4
-          CCACHE_COMPILERCHECK=content
-          CCACHE_DIRECT=true
-          EOF
-
           # Setup CCACHE Dir
           sudo mkdir -p /mnt/ccache
           sudo chown -R $USER:$USER /mnt/ccache
-          echo "CCACHE_DIR=/mnt/ccache" >> $GITHUB_ENV
-          echo "CCACHE Dir Set!"
           # Setup tarballs dir for download caching
           sudo mkdir -p /mnt/tarballs
           sudo chown -R $USER:$USER /mnt/tarballs
-          df -h
-          echo "CCACHE Environment set!"
       - name: Enable the CCACHE
-        uses: hendrikmuhs/ccache-action@v1.2
+        uses: Chocobo1/setup-ccache-action@v1
         with:
-          create-symlink: 'true'
-          key: 'ccache-${{ runner.os }}-${{ matrix.target }}'
-          restore-keys: |
-            ccache-${{ runner.os }}-
-          max-size: 5000MB
-          verbose: 2
-          save: true
+          update_packager_index: false
+          install_ccache: false
+          prepend_symlinks_to_path: true
+          ccache_options: |
+            max_size=10000M
+            cache_dir=/mnt/ccache
+            compression=true
+            compression_level=16
+            hash_dir=false
+            sloppiness=locale,time_macros,random_seed,file_macro,include_file_mtime,include_file_ctime,file_stat_matches,pch_defines,clang_index_store,ivfsoverlay,modules,system_headers
+            file_clone=true
+            hard_link=false
+            inode_cache=true
+            recache=false
+            direct_mode=true
+            nlevels=4
+            compiler_check=content
       - name: Tarballs Cache (Shared)
         uses: actions/cache@v5 # Use the combined save/restore action
         with:
@@ -204,7 +196,7 @@ jobs:
           done
       - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
         name: Publish Release
-        uses: xiechangan123/action-gh-release@master
+        uses: softprops/action-gh-release@v3
         with:
           name: '${{ inputs.release_name }}'
           tag_name: '${{ inputs.release_name }}'
