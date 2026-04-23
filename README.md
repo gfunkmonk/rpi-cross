@@ -20,15 +20,6 @@ into the default specs.
 | Pi 3 / Zero 2W              | 64 | `aarch64-rpi3-linux-*`     | `gnu`, `musl`, `uclibc`                      |
 | Pi 4 / CM4                  | 64 | `aarch64-rpi4-linux-*`     | `gnu`, `musl`, `uclibc`                      |
 | Pi 5                        | 64 | `aarch64-rpi5-linux-*`     | `gnu`, `musl`, `uclibc`                      |
-
-
-| Miscellaneous     | Bits | Triple                             | Notes
-| ------------------| ---- | ---------------------------------- | ---------------------------------------------|
-| Pi Pico			| 32 | `armv6m-pico-eabi`	    | built with `picolib`			 |
-| Pi Pico2		| 32 | `armv8m-pico-eabi`	    | built with `picolib`			 |
-| Beagle Bone Black		| 32 | `armv7-beaglebone-linux-*` | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
-| linaro gcc                  | 32 | `arm-linaro-gcc`           | `Linaro GCC 7.4-2019.02`                     |
-
 ## Versions
 
 | Component | Version |
@@ -40,6 +31,15 @@ into the default specs.
 | musl      | 1.2.6   |
 | uClibc-ng | 1.0.57  |
 | Linker    | mold (default) |
+
+## Miscellaneous
+| Type     | Bits | Triple                             | Notes
+| ------------------| ---- | ---------------------------------- | ---------------------------------------------|
+| Pi Pico			       | 32 | `armv6m-pico-eabi`	    | built with `picolib`			 |
+| Pi Pico2		       | 32 | `armv8m-pico-eabi`	    | built with `picolib`			 |
+| Beagle Bone Black		      | 32 | `armv7-beaglebone-linux-*` | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
+| linaro gcc                         | 32 | `arm-linaro-musl`           | `Linaro GCC 7.4-2019.02`                     |
+
 
 ## Install (prebuilt tarballs)
 
