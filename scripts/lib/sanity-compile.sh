@@ -33,11 +33,42 @@ int main(void) {
 }
 C
 
-# 1. The compiler must produce an object and an executable.
-"${GCC}" -c   "${TMPDIR}/hello.c" -o "${TMPDIR}/hello.o"
-"${GCC}"      "${TMPDIR}/hello.c" -o "${TMPDIR}/hello"
+# Bare-metal targets (e.g. the Pi Pico *-eabi / *-eabihf triples) don't have a
+# Linux-style sysroot and need extra link-time options (--specs=picolibc.specs,
+# a linker script, etc.) that this generic smoke test can't supply. For those
+# we only verify that the compiler can produce a valid object file for the
+# expected architecture.
+case "${TARGET}" in
+    *-linux-*) BARE_METAL=0 ;;
+    *)         BARE_METAL=1 ;;
+esac
 
-# 2. The executable must be for the expected architecture and endianness.
+"${GCC}" -c "${TMPDIR}/hello.c" -o "${TMPDIR}/hello.o"
+
+if [[ "${BARE_METAL}" -eq 1 ]]; then
+    info=$(file "${TMPDIR}/hello.o")
+    echo "${info}"
+    case "${TARGET}" in
+        aarch64-*)
+            echo "${info}" | grep -q 'ELF 64-bit LSB.*ARM aarch64' \
+                || { echo "::error::not an aarch64 ELF"; exit 1; }
+            ;;
+        armv6-*|armv6m-*|armv7-*|armv8m-*|armv8-*)
+            echo "${info}" | grep -q 'ELF 32-bit LSB.*ARM' \
+                || { echo "::error::not a 32-bit ARM ELF"; exit 1; }
+            ;;
+        *)
+            echo "::error::unknown target family for sanity check: ${TARGET}" >&2
+            exit 1
+            ;;
+    esac
+    echo "sanity check (compile-only) passed for ${TARGET}"
+    exit 0
+fi
+
+# Linux targets: go further and link an executable so we can check its ABI.
+"${GCC}" "${TMPDIR}/hello.c" -o "${TMPDIR}/hello"
+
 info=$(file "${TMPDIR}/hello")
 echo "${info}"
 
@@ -56,11 +87,11 @@ case "${TARGET}" in
         ;;
 esac
 
-# 3. For hard-float ABIs, the ELF note must advertise the VFP register
-#    convention; for soft-float the note must NOT advertise it.
-#    file(1) reports "hard-float" for glibc targets, but may omit it for
-#    musl targets (which use ld-musl-armhf.so.1 as the interpreter instead).
-#    Fall back to readelf -A to check the ARM ABI attributes section directly.
+# For hard-float ABIs, the ELF note must advertise the VFP register
+# convention; for soft-float the note must NOT advertise it.
+# file(1) reports "hard-float" for glibc targets, but may omit it for
+# musl targets (which use ld-musl-armhf.so.1 as the interpreter instead).
+# Fall back to readelf -A to check the ARM ABI attributes section directly.
 case "${TARGET}" in
     *eabihf*)
         if ! echo "${info}" | grep -q 'hard-float'; then

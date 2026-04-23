@@ -92,10 +92,6 @@ jobs:
         with:
           fetch-depth: 1
           submodules: true
-      - name: Enable Kitware Repository
-        run: |
-          test -f /usr/share/doc/kitware-archive-keyring/copyright || wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
-          echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
       - name: CCACHE Stuff
         run: |
           DEBIAN_FRONTEND=noninteractive sudo apt-get -y update
@@ -203,10 +199,16 @@ jobs:
           merge-multiple: true
       - name: Generate release
         run: |
+          set -eu
           echo "| Filename | Sha256sum |" > RELEASE.md
           echo "| -------- | --------- |" >> RELEASE.md
+          : > release/SHA256SUMS
           for i in release/*.sha256; do
-            echo "| $(basename "$i" .sha256) | \`$(awk '{print $1}' "$i")\` |" >> RELEASE.md
+            name=$(basename "$i" .sha256)
+            hash=$(awk '{print $1}' "$i")
+            echo "| ${name} | \`${hash}\` |" >> RELEASE.md
+            # Aggregate checksum file, compatible with: sha256sum -c SHA256SUMS
+            echo "${hash}  ${name}" >> release/SHA256SUMS
           done
       - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
         name: Publish Release

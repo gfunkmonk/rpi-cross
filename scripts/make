@@ -16,7 +16,8 @@ if [[ ! -d "targets/${TARGET}" ]]; then
 fi
 
 # packages
-sudo apt update -qy && sudo apt install -y         \
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get update -qy && sudo apt-get install -y \
   --no-install-recommends automake build-essential \
   bzip2 cmake curl bison flex gawk gdb git gperf   \
   help2man libncurses-dev libssl-dev libtool-bin   \
@@ -36,7 +37,6 @@ popd
 
 # crosstool-ng
 sudo mkdir -p /opt
-sudo chown 0777 /opt
 sudo rm -rf /opt/ct-ng
 pushd builder
 ./bootstrap
@@ -56,7 +56,6 @@ echo 'CT_SAVE_TARBALLS=y' >> build/.config
 
 pushd build
 /opt/ct-ng/bin/ct-ng olddefconfig
-# shellcheck disable=SC2086 # intentional word-splitting of EXTRA_CT_NG_ARGS
 /opt/ct-ng/bin/ct-ng build."$(nproc)"
 popd
 
