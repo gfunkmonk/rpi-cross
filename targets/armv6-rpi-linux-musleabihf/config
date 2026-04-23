@@ -4,6 +4,7 @@ CT_PREFIX_DIR="/opt/x-tools/${CT_TARGET}"
 # CT_LOG_PROGRESS_BAR is not set
 CT_ARCH_ARCH="armv6zk"
 CT_ARCH_CPU="arm1176jzf-s"
+CT_ARCH_TUNE="arm1176jzf-s"
 CT_ARCH_FPU="vfpv2"
 CT_ARCH_ARM=y
 CT_ARCH_SUFFIX="v6"
@@ -23,4 +24,5 @@ CT_LINKER_MOLD=y
 CT_GCC_V_15=y
 CT_BINUTILS_V_2_46=y
 CT_TOOLCHAIN_PKGVERSION="Raspberry Pi"
-CT_TARGET_CFLAGS="-O2 -pipe -ftree-vectorize -fomit-frame-pointer -marm -mfloat-abi=hard"
+CT_TARGET_CFLAGS="-O3 -pipe -ftree-vectorize -fomit-frame-pointer -marm -mfloat-abi=hard"
+CT_TARGET_LDFLAGS="-s -w"

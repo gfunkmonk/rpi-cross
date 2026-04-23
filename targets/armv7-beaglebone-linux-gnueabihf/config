@@ -5,6 +5,7 @@ CT_PREFIX_DIR="/opt/x-tools/${CT_TARGET}"
 CT_ARCH_ARM=y
 CT_ARCH_ARCH=armv7-a
 CT_ARCH_CPU="cortex-a8"
+CT_ARCH_TUNE="cortex-a8"
 # CT_ARCH_SUFFIX is not set
 CT_ARCH_FPU="neon"
 CT_ARCH_FLOAT_HW=y
@@ -22,4 +23,5 @@ CT_CC_LANG_CXX=y
 CT_LINKER_MOLD=y
 CT_GCC_V_15=y
 CT_BINUTILS_V_2_46=y
-CT_TARGET_CFLAGS="-O2 -pipe -ftree-vectorize -fomit-frame-pointer -marm -mfloat-abi=hard"
+CT_TARGET_CFLAGS="-O3 -pipe -ftree-vectorize -fomit-frame-pointer -marm -mfloat-abi=hard"
+CT_TARGET_LDFLAGS="-s -w"
