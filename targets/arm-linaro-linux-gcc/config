@@ -1,9 +1,9 @@
 CT_CONFIG_VERSION="4"
 CT_EXPERIMENTAL=y
-CT_TARGET_ALIAS="arm-linaro-linux-musl"
+CT_TARGET_ALIAS="arm-linaro-gcc"
 CT_ALLOW_BUILD_AS_ROOT=y
 CT_ALLOW_BUILD_AS_ROOT_SURE=y
-CT_PREFIX_DIR="/opt/x-tools/arm-linaro-linux-musl"
+CT_PREFIX_DIR="/opt/x-tools/${CT_TARGET_ALIAS}"
 # CT_LOG_PROGRESS_BAR is not set
 CT_ARCH_ARM=y
 # CT_ARCH_ARCH is not set
@@ -14,14 +14,11 @@ CT_ARCH_32=y
 # CT_ARCH_ARM_TUPLE_USE_EABIHF is not set
 CT_ARCH_FPU="neon-vfpv4"
 CT_ARCH_FLOAT_HW=y
-# CT_ARCH_FLOAT_SOFTFP is not set
-# CT_ARCH_FLOAT_SW is not set
 CT_ARCH_FLOAT="hard"
 CT_TARGET_VENDOR="linaro"
 CT_KERNEL_LINUX=y
 CT_LINUX_V_6_18=y
 CT_BINUTILS_PLUGINS=y
-CT_BINUTILS_FOR_TARGET=y
 CT_BINUTILS_V_2_46=y
 CT_LINKER_MOLD=y
 CT_LIBC_MUSL=y
@@ -31,6 +28,3 @@ CT_CC_LANG_CXX=y
 CT_TOOLCHAIN_PKGVERSION="Linaro GCC 7.4-2019.02"
 CT_TARGET_CFLAGS="-O2 -pipe -ftree-vectorize -fomit-frame-pointer -ffunction-sections -fdata-sections -mfloat-abi=hard"
 CT_TARGET_LDFLAGS="-Wl,--gc-sections -Wl,-O1 -Wl,--as-needed -s -w"
-CT_WANTS_STATIC_LINK=y
-CT_WANTS_STATIC_LINK_CXX=y
-CT_STATIC_TOOLCHAIN=y
