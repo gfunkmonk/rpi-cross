@@ -92,7 +92,7 @@ REAL_TARGET=
 _prev_nullglob=$(shopt -p nullglob || true)
 shopt -s nullglob
 for d in "${TARGET}"/arm-linaro-*/; do
-    REAL_TARGET="${d#${TARGET}/}"
+    REAL_TARGET="${d#"${TARGET}"/}"
     REAL_TARGET="${REAL_TARGET%/}"
     break
 done
@@ -108,8 +108,10 @@ else
 fi
 
 # The old sneaky pete
-if [ -n "$REAL_TARGET" ] && [ -d "${REAL_TARGET}/bin" ]; then
-    TARGET_BIN="${REAL_TARGET}/bin"
+# REAL_TARGET is the bare inner dir name (stripped of ${TARGET}/); the
+# inner bin/ lives at ${TARGET}/${REAL_TARGET}/bin.
+if [ -n "$REAL_TARGET" ] && [ -d "${TARGET}/${REAL_TARGET}/bin" ]; then
+    TARGET_BIN="${TARGET}/${REAL_TARGET}/bin"
     echo "Doing the mold to gold switch-a-roo"
     # We MUST jump in so the symlink is relative ("naked")
     pushd "$TARGET_BIN" >/dev/null
