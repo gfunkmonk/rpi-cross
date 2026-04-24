@@ -6,7 +6,7 @@ CT_ARCH_ARM=y
 CT_ARCH_ARCH="armv7-a"
 CT_ARCH_CPU="cortex-a8"
 CT_ARCH_TUNE="cortex-a8"
-#CT_ARCH_SUFFIX is not set
+CT_ARCH_SUFFIX="v7"
 CT_ARCH_FPU="neon"
 CT_ARCH_FLOAT_HW=y
 # CT_ARCH_FLOAT_SOFTFP is not set

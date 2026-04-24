@@ -85,46 +85,60 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Copying toolchain to PWD
 sudo mv /opt/x-tools/"${TARGET}" .
-sudo chown -R root:root "${TARGET}"
+sudo chown -R "$(id -u):$(id -g)" "${TARGET}"
+sudo chmod -R u+rwX "${TARGET}"
 
-# das hinterhältig
-REAL_TARGET=
-_prev_nullglob=$(shopt -p nullglob || true)
-shopt -s nullglob
-for d in "${TARGET}"/arm-linaro-*/; do
-    REAL_TARGET="${d#${TARGET}/}"
-    REAL_TARGET="${REAL_TARGET%/}"
-    break
+p="${TARGET}"
+while [ "$p" != "/" ] && [ -n "$p" ]; do
+  p="$(dirname "$p")"
+  sudo chmod u+x "$p" 2>/dev/null || true
 done
-eval "$_prev_nullglob"
-unset _prev_nullglob
-if [ -n "$REAL_TARGET" ]; then
-    echo "[INFO] linker hack: linking arm-linaro-musl -> ${REAL_TARGET}"
-    pushd "$TARGET" >/dev/null
-    sudo ln -snf "${REAL_TARGET}" "${TARGET}"
-    popd >/dev/null
-else
-    echo "[INFO] linker hack: no arm-linaro-*/ dir under ${TARGET}/, skipping"
-fi
 
-# The old sneaky pete
-if [ -n "$REAL_TARGET" ] && [ -d "${REAL_TARGET}/bin" ]; then
-    TARGET_BIN="${REAL_TARGET}/bin"
-    echo "Doing the mold to gold switch-a-roo"
-    # We MUST jump in so the symlink is relative ("naked")
-    pushd "$TARGET_BIN" >/dev/null
-    # Create the naked, relative symlink
-    if [ -f "mold" ]; then
-        sudo ln -sf mold ld.gold
-        echo "[SUCCESS] Internal ld.gold -> mold link secured in ${TARGET_BIN}"
-    else
-        echo "[ERROR] mold binary not found in $TARGET_BIN"
+# Linaro toolchains land with an outer ${TARGET} alias dir wrapping a real
+# crosstool-ng tuple dir, and gcc's hardcoded "<prefix>/<triple>/..." probes
+# need two symlinks to line up:
+#   1. ${TARGET}/${TARGET}                -> ${REAL_TARGET}
+#   2. ${TARGET}/${REAL_TARGET}/bin/ld.gold -> mold    (naked/relative)
+# Non-linaro targets have no arm-linaro-*/ subdir and fall through as a no-op.
+linaro_hack() {
+    local target=$1
+    local real_target='' real_bin d prev_nullglob
+    prev_nullglob=$(shopt -p nullglob || true)
+    shopt -s nullglob
+    for d in "${target}"/arm-linaro-*/; do
+        real_target=${d#"${target}"/}
+        real_target=${real_target%/}
+        break
+    done
+    eval "$prev_nullglob"
+
+    # das hinterhältig
+    if [ -z "$real_target" ]; then
+        echo "[INFO] linker hack: no arm-linaro-*/ dir under ${target}/, skipping"
+        return 0
     fi
-    # There's no place like home, toto.
-    popd >/dev/null
-else
-    echo "[SKIP] linker hack isn't needed"
-fi
+
+    real_bin=${target}/${real_target}/bin
+
+    echo "[INFO] linaro hack: linking ${target}/${target} -> ${real_target}"
+    ( cd "$target" && sudo ln -snf "$real_target" "$target" )
+
+    # the old sneaky pete
+    if [ ! -d "$real_bin" ]; then
+        echo "[SKIP] linaro hack: no ${real_bin} dir, skipping mold->ld.gold"
+        return 0
+    fi
+
+    echo "Doing the mold to gold switch-a-roo"
+    if [ ! -f "${real_bin}/mold" ]; then
+        echo "[ERROR] mold binary not found in ${real_bin}"
+        return 0
+    fi
+    ( cd "$real_bin" && sudo ln -sf mold ld.gold )
+    echo "[SUCCESS] Internal ld.gold -> mold link secured in ${real_bin}"
+}
+
+linaro_hack "$TARGET"
 
 # tarball
 sudo tar --sort=name --owner=0 --group=0 --numeric-owner -I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
