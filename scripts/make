@@ -3,15 +3,25 @@
 set -e
 set -o pipefail
 
+RED="$(tput setaf 9)"
+GREEN="$(tput setaf 10)"
+YELLOW="$(tput setaf 11)"
+BLUE="$(tput setaf 12)"
+PURPLE="$(tput setaf 13)"
+CYAN="$(tput setaf 14)"
+WHITE="$(tput setaf 15)"
+BLACK="$(tput setaf 0)"
+NC="$(tput sgr0)"
+
 if [[ $# -lt 1 || -z "$1" ]]; then
-    echo "Usage: $0 <target>" >&2
-    echo "Example: $0 aarch64-rpi5-linux-gnu" >&2
+    echo -e "${WHITE}Usage: $0 <target>${NC}" >&2
+    echo -e "${BLUE}Example: $0 aarch64-rpi5-linux-gnu${NC}" >&2
     exit 1
 fi
 
 TARGET=$1
 if [[ ! -d "targets/${TARGET}" ]]; then
-    echo "Error: target '${TARGET}' not found in targets/" >&2
+    echo -e "${RED}Error: target '${TARGET}' not found in targets/${NC}" >&2
     exit 1
 fi
 
@@ -108,28 +118,28 @@ linaro_hack() {
 
     # das hinterhältig
     if [ -z "$real_target" ]; then
-        echo "[INFO] linker hack: no arm-linaro-*/ dir under ${target}/, skipping"
+        echo -e "${GREEN}[INFO] linker hack: no arm-linaro-*/ dir under ${target}/, skipping${NC}"
         return 0
     fi
 
     real_bin=${target}/${real_target}/bin
 
-    echo "[INFO] linaro hack: linking ${target}/${target} -> ${real_target}"
+    echo -e "${PURPLE}[INFO] linaro hack: linking ${target}/${target} -> ${real_target}${NC}"
     ( cd "$target" && sudo ln -snf "$real_target" "$target" )
 
     # the old sneaky pete
     if [ ! -d "$real_bin" ]; then
-        echo "[SKIP] linaro hack: no ${real_bin} dir, skipping mold->ld.gold"
+        echo -e "${YELLOW}[SKIP] linaro hack: no ${real_bin} dir, skipping mold->ld.gold${NC}"
         return 0
     fi
 
-    echo "Doing the mold to gold switch-a-roo"
+    echo "${BLUE}Doing the mold to gold switch-a-roo${NC}"
     if [ ! -f "${real_bin}/mold" ]; then
-        echo "[ERROR] mold binary not found in ${real_bin}"
+        echo -e "${RED}[ERROR] mold binary not found in ${real_bin}"
         return 0
     fi
     ( cd "$real_bin" && sudo ln -sf mold ld.gold )
-    echo "[SUCCESS] Internal ld.gold -> mold link secured in ${real_bin}"
+    echo -e "${PURPLE}[SUCCESS] Internal ld.gold -> mold link secured in ${real_bin}${NC}"
 }
 
 linaro_hack "$TARGET"
