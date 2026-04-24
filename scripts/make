@@ -82,7 +82,7 @@ sudo mv /opt/x-tools/"${TARGET}" .
 sudo chown -R "$(id -u):$(id -g)" "${TARGET}"
 sudo chmod -R u+rwX "${TARGET}"
 
-p="${TARGET}"
+p="$(pwd)/${TARGET}"
 while [ "$p" != "/" ] && [ -n "$p" ]; do
   p="$(dirname "$p")"
   sudo chmod u+x "$p" 2>/dev/null || true
