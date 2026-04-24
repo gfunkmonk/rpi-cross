@@ -85,17 +85,22 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Copying toolchain to PWD
 sudo mv /opt/x-tools/"${TARGET}" .
-sudo chown -R root:root "${TARGET}"
+sudo chown -R "$(id -u):$(id -g)" "${TARGET}"
+sudo chmod -R u+rwX "${TARGET}"
 
-# das hinterhältig -- the old sneaky pete
-#
+p="${TARGET}"
+while [ "$p" != "/" ] && [ -n "$p" ]; do
+  p="$(dirname "$p")"
+  sudo chmod u+x "$p" 2>/dev/null || true
+done
+
 # Linaro toolchains land with an outer ${TARGET} alias dir wrapping a real
 # crosstool-ng tuple dir, and gcc's hardcoded "<prefix>/<triple>/..." probes
 # need two symlinks to line up:
 #   1. ${TARGET}/${TARGET}                -> ${REAL_TARGET}
 #   2. ${TARGET}/${REAL_TARGET}/bin/ld.gold -> mold    (naked/relative)
 # Non-linaro targets have no arm-linaro-*/ subdir and fall through as a no-op.
-linaro_linker_hack() {
+linaro_hack() {
     local target=$1
     local real_target='' real_bin d prev_nullglob
     prev_nullglob=$(shopt -p nullglob || true)
@@ -107,6 +112,7 @@ linaro_linker_hack() {
     done
     eval "$prev_nullglob"
 
+    # das hinterhältig
     if [ -z "$real_target" ]; then
         echo "[INFO] linker hack: no arm-linaro-*/ dir under ${target}/, skipping"
         return 0
@@ -114,11 +120,12 @@ linaro_linker_hack() {
 
     real_bin=${target}/${real_target}/bin
 
-    echo "[INFO] linker hack: linking ${target}/${target} -> ${real_target}"
+    echo "[INFO] linaro hack: linking ${target}/${target} -> ${real_target}"
     ( cd "$target" && sudo ln -snf "$real_target" "$target" )
 
+    # the old sneaky pete
     if [ ! -d "$real_bin" ]; then
-        echo "[SKIP] linker hack: no ${real_bin} dir, skipping mold->ld.gold"
+        echo "[SKIP] linaro hack: no ${real_bin} dir, skipping mold->ld.gold"
         return 0
     fi
 
@@ -131,7 +138,7 @@ linaro_linker_hack() {
     echo "[SUCCESS] Internal ld.gold -> mold link secured in ${real_bin}"
 }
 
-linaro_linker_hack "$TARGET"
+linaro_hack "$TARGET"
 
 # tarball
 sudo tar --sort=name --owner=0 --group=0 --numeric-owner -I 'xz -T0 -9' -cvf "${TARGET}".tar.xz "${TARGET}"
