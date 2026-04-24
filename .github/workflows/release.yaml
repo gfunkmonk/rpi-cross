@@ -149,7 +149,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ct-ng-failure-logs
-          path: build.log
+          path: build/build.log
       - name: Upload package
         uses: actions/upload-artifact@v7
         with:
