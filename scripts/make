@@ -74,11 +74,16 @@ mkdir -p build
 cp targets/"${TARGET}"/config build/.config
 
 # Configure tarballs directory for download caching
-echo 'CT_LOCAL_TARBALLS_DIR="/mnt/tarballs"' >>build/.config
-echo 'CT_SAVE_TARBALLS=y' >>build/.config
+{
+  echo 'CT_LOCAL_TARBALLS_DIR="/mnt/tarballs"'
+  echo 'CT_SAVE_TARBALLS=y'
+} >>build/.config 
 
-echo 'CT_ALLOW_BUILD_AS_ROOT=y' >>build/.config
-echo 'CT_ALLOW_BUILD_AS_ROOT_SURE=y' >>build/.config
+# build as root
+{
+  echo 'CT_ALLOW_BUILD_AS_ROOT=y'
+  echo 'CT_ALLOW_BUILD_AS_ROOT_SURE=y'
+} >>build/.config
 
 pushd build
 "${CT_BIN}" olddefconfig
