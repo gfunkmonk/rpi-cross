@@ -145,10 +145,10 @@ jobs:
           chmod +x ./scripts/make
           bash ./scripts/make ${{ matrix.target }}
       - name: Upload Logs on Failure
-        if: failure() || canceled()
+        if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: ct-ng-failure-logs
+          name: logs-${{ matrix.target }}
           path: build/build.log
       - name: Upload package
         uses: actions/upload-artifact@v7
