@@ -1,0 +1,220 @@
+name: Test
+'on':
+  workflow_dispatch:
+    inputs:
+      make_release:
+        description: GitHub Release?
+        type: boolean
+        default: false
+      release_name:
+        description: Release name?
+        type: string
+        default: ''
+      swapspace:
+        description: Add Swap
+        required: true
+        type: boolean
+        default: false
+      swapsize:
+        description: Swap Size (in gb)
+        type: choice
+        required: false
+        options: [3, 5, 10]
+        default: 5
+      sshserver:
+        description: Run SSH Server before build
+        required: true
+        type: boolean
+        default: false
+      freespace:
+        description: Clear Disk Space
+        required: true
+        type: boolean
+        default: false
+concurrency:
+  group: '${{ github.workflow }}-${{ github.ref }}'
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          #- aarch64-rpi3-linux-gnu
+          #- aarch64-rpi3-linux-musl
+          #- aarch64-rpi3-linux-uclibc
+          #- aarch64-rpi4-linux-gnu
+          #- aarch64-rpi4-linux-musl
+          #- aarch64-rpi4-linux-uclibc
+          #- aarch64-rpi5-linux-gnu
+          #- aarch64-rpi5-linux-musl
+          #- aarch64-rpi5-linux-uclibc
+          #- armv6-rpi-linux-gnueabihf
+          #- armv6-rpi-linux-musleabihf
+          #- armv6-rpi-linux-uclibcgnueabihf
+          #- armv7-rpi2-linux-gnueabihf
+          #- armv7-rpi2-linux-musleabihf
+          #- armv7-rpi2-linux-uclibcgnueabihf
+          #- armv8-rpi3-linux-gnueabihf
+          #- armv8-rpi3-linux-musleabihf
+          #- armv8-rpi3-linux-uclibcgnueabihf
+          #- armv8-rpi4-linux-gnueabihf
+          #- armv8-rpi4-linux-musleabihf
+          #- armv8-rpi4-linux-uclibcgnueabihf
+          - armv6m-pico-eabi
+          - armv8m-pico-eabihf
+          #- armv7-beaglebone-linux-gnueabihf
+          #- armv7-beaglebone-linux-musleabihf
+          #- armv7-beaglebone-linux-uclibcgnueabihf
+          #- arm-linaro-gnu
+          #- arm-linaro-musl
+          #- arm-linaro-uclibc
+    steps:
+      - if: '${{ inputs.freespace }}'
+        name: Free Up Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          swap-storage: false
+          large-packages: true
+          tool-cache: true
+          android: true
+          dotnet: true
+          haskell: false
+          docker-images: true
+      - if: '${{ inputs.swapspace }}'
+        name: Add Swap Space for Build
+        uses: pierotofy/set-swap-space@master
+        with:
+          swap-size-gb: '${{ inputs.swapsize }}'
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+          submodules: true
+      - name: CCACHE Stuff
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo -E apt-get -y update
+          sudo -E apt-get -y install apt-utils ccache ca-certificates gpg wget zstd
+          # Setup CCACHE Dir
+          sudo mkdir -p /mnt/ccache
+          sudo chown -R $USER:$USER /mnt/ccache
+          # Setup tarballs dir for download caching
+          sudo mkdir -p /mnt/tarballs
+          sudo chown -R $USER:$USER /mnt/tarballs
+      - name: Enable the CCACHE
+        uses: Chocobo1/setup-ccache-action@v1
+        with:
+          update_packager_index: false
+          install_ccache: false
+          prepend_symlinks_to_path: true
+          ccache_options: |
+            max_size=5000M
+            cache_dir=/mnt/ccache
+            compression=true
+            compression_level=16
+            hash_dir=false
+            sloppiness=locale,time_macros,random_seed,file_macro,include_file_mtime,include_file_ctime,file_stat_matches,pch_defines,clang_index_store,ivfsoverlay,modules,system_headers
+            file_clone=true
+            hard_link=false
+            inode_cache=true
+            recache=false
+            direct_mode=true
+            depend_mode=false
+            compiler_check=content
+      - name: Tarballs Cache (Shared)
+        uses: actions/cache@v5 # Use the combined save/restore action
+        with:
+          path: /mnt/tarballs
+          # Hash a file that actually lists your source dependencies
+          key: tarballs-shared-${{ hashFiles('scripts/make', '**/config') }}
+          restore-keys: |
+            tarballs-shared-
+      - if: '${{ inputs.sshserver }}'
+        name: SSH Server-ing
+        uses: valeriangalliat/action-sshd-cloudflared@v4
+      - name: Build
+        run: |
+          umask 0022
+          sudo rm -rf /opt/*
+          chmod +x ./scripts/make
+          bash ./scripts/make ${{ matrix.target }}
+      - name: Upload Logs on Failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ct-ng-failure-logs
+          path: build/build.log
+      - name: Upload package
+        uses: actions/upload-artifact@v7
+        with:
+          name: '${{ matrix.target }}.tar.xz'
+          path: '${{ matrix.target }}.tar.xz'
+          if-no-files-found: error
+          retention-days: 1
+      - name: Upload checksum
+        uses: actions/upload-artifact@v7
+        with:
+          name: '${{ matrix.target }}.tar.xz.sha256'
+          path: '${{ matrix.target }}.tar.xz.sha256'
+          if-no-files-found: error
+          retention-days: 1
+  release:
+    name: Release
+    runs-on: ubuntu-slim
+    needs:
+      - build
+    if: |
+      !cancelled() && github.event.inputs.make_release == 'true'
+    permissions:
+      contents: write
+    steps:
+      - name: Validate inputs
+        run: |
+          if [[ -z "${{ inputs.release_name }}" ]]; then
+            echo "::error::release_name is required when make_release is true"
+            exit 1
+          fi
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 1
+      - name: Download artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release
+          pattern: '*.tar.*'
+          merge-multiple: true
+      - name: Generate release
+        run: |
+          set -eu
+          echo "| Filename | Sha256sum |" > RELEASE.md
+          echo "| -------- | --------- |" >> RELEASE.md
+          : > release/SHA256SUMS
+          for i in release/*.sha256; do
+            name=$(basename "$i" .sha256)
+            hash=$(awk '{print $1}' "$i")
+            echo "| ${name} | \`${hash}\` |" >> RELEASE.md
+            # Aggregate checksum file, compatible with: sha256sum -c SHA256SUMS
+            echo "${hash}  ${name}" >> release/SHA256SUMS
+          done
+      - if: '${{ inputs.release_name != '''' && inputs.make_release }}'
+        name: Publish Release
+        uses: softprops/action-gh-release@v3
+        with:
+          name: '${{ inputs.release_name }}'
+          tag_name: '${{ inputs.release_name }}'
+          prerelease: false
+          draft: false
+          generate_release_notes: false
+          make_latest: true
+          files: |
+            release/*.tar.xz
+            release/*.tar.xz.sha256
+            release/SHA256SUMS
+          body_path: RELEASE.md
