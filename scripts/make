@@ -3,15 +3,15 @@
 set -e
 set -o pipefail
 
-RED="$(tput setaf 9)"
-GREEN="$(tput setaf 10)"
-YELLOW="$(tput setaf 11)"
-BLUE="$(tput setaf 12)"
-PURPLE="$(tput setaf 13)"
-CYAN="$(tput setaf 14)"
-WHITE="$(tput setaf 15)"
-BLACK="$(tput setaf 0)"
-NC="$(tput sgr0)"
+RED="\033[31;1m"
+GREEN="\033[32;1m""
+YELLOW="\033[33;1m""
+BLUE="\033[34;1m"
+PURPLE="\033[35;1m"
+CYAN="\033[36;1m"
+WHITE="\033[37;1m"
+BLACK="\033[30;0m"
+NC="\033[0m"
 
 if [[ $# -lt 1 || -z "$1" ]]; then
     echo -e "${WHITE}Usage: $0 <target>${NC}" >&2
