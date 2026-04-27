@@ -26,16 +26,21 @@ if [[ ! -d "targets/${TARGET}" ]]; then
 fi
 
 # Enable Kitware repo
-test -f /usr/share/keyrings/kitware-archive-keyring.gpg || { wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null; }
-echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ noble main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
+test -f /usr/share/keyrings/kitware-archive-keyring.gpg || {
+  wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | \
+    gpg --dearmor | \
+    sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg > /dev/null; }
+echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] \
+https://apt.kitware.com/ubuntu/ noble main" | \
+  sudo tee /etc/apt/sources.list.d/kitware.list > /dev/null
 
 # packages
 export DEBIAN_FRONTEND=noninteractive
 PACKAGES=(
-    automake bison build-essential bzip2 cmake curl
-    flex gawk gdb git gperf help2man libncurses-dev
-    libssl-dev libtool-bin libzstd-dev pkg-config
-    python3 rsync texinfo unzip wget xz-utils
+    automake bison build-essential bzip2 ca-certificates cmake 
+    curl flex gawk gdb git gperf gpg help2man libncurses-dev
+    libssl-dev libtool-bin libzstd-dev meson ninja-build pkg-config 
+    python3 rsync texinfo unzip wget xz-utils zstd
 )
 
 sudo -E apt-get update -qy

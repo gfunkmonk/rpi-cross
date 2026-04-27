@@ -99,8 +99,8 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          sudo -E apt-get -y update
-          sudo -E apt-get -y install apt-utils ccache ca-certificates gpg wget zstd
+          #sudo -E apt-get -y update
+          #sudo -E apt-get -y install apt-utils ccache ca-certificates gpg wget zstd
           # Setup CCACHE Dir
           sudo mkdir -p /mnt/ccache
           sudo chown -R $USER:$USER /mnt/ccache
@@ -110,8 +110,8 @@ jobs:
       - name: Enable the CCACHE
         uses: Chocobo1/setup-ccache-action@v1
         with:
-          update_packager_index: false
-          install_ccache: false
+          update_packager_index: true
+          install_ccache: true
           prepend_symlinks_to_path: true
           ccache_options: |
             max_size=5000M
@@ -145,8 +145,8 @@ jobs:
           chmod +x ./scripts/make
           bash ./scripts/make ${{ matrix.target }}
       - name: Upload Logs on Failure
-        if: failure()
-        uses: actions/upload-artifact@v4
+        if: failure() || canceled()
+        uses: actions/upload-artifact@v7
         with:
           name: ct-ng-failure-logs
           path: build/build.log
