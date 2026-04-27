@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -e
-set -o pipefail
+set -eo pipefail
 
 RED="\033[31;1m"
 GREEN="\033[32;1m"
@@ -77,6 +76,9 @@ cp targets/"${TARGET}"/config build/.config
 # Configure tarballs directory for download caching
 echo 'CT_LOCAL_TARBALLS_DIR="/mnt/tarballs"' >>build/.config
 echo 'CT_SAVE_TARBALLS=y' >>build/.config
+
+echo 'CT_ALLOW_BUILD_AS_ROOT=y' >>build/.config
+echo 'CT_ALLOW_BUILD_AS_ROOT_SURE=y' >>build/.config
 
 pushd build
 "${CT_BIN}" olddefconfig
