@@ -34,8 +34,8 @@ export DEBIAN_FRONTEND=noninteractive
 PACKAGES=(
     automake bison build-essential bzip2 cmake curl
     flex gawk gdb git gperf help2man libncurses-dev
-    libssl-dev libtool-bin libzstd-dev pkg-config
-    python3 rsync texinfo unzip wget xz-utils
+    libssl-dev libtool-bin libzstd-dev meson ninja-build
+    pkg-config python3 rsync texinfo unzip wget xz-utils
 )
 
 sudo -E apt-get update -qy
