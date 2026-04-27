@@ -14,15 +14,15 @@ CT_ARCH_FLOAT_HW=y
 # CT_ARCH_FLOAT_SW is not set
 CT_ARCH_FLOAT="hard"
 CT_KERNEL_LINUX=y
-CT_LINUX_V_6_18=y
+CT_LINUX_V_6_6=y
 CT_BINUTILS_PLUGINS=y
 CT_BINUTILS_FOR_TARGET=y
 CT_LIBC_GLIB=y
-CT_GLIBC_V_2_41=y
+CT_GLIBC_V_2_17=y
 CT_GCC_USE_LINARO=y
 CT_CC_LANG_CXX=y
 CT_LINKER_MOLD=y
-CT_BINUTILS_V_2_46=y
+CT_BINUTILS_V_2_26=y
 CT_TOOLCHAIN_PKGVERSION="Amazon Kindle - Linaro GCC"
 CT_TARGET_CFLAGS="-O2 -pipe -ftree-vectorize -fomit-frame-pointer -mno-unaligned-access -ffunction-sections -fdata-sections -marm -mfloat-abi=hard"
 CT_TARGET_LDFLAGS="-Wl,--gc-sections -Wl,-O1 -Wl,--as-needed -s -w"
