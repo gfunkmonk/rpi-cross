@@ -9,12 +9,11 @@ BLUE="\033[34;1m"
 PURPLE="\033[35;1m"
 CYAN="\033[36;1m"
 WHITE="\033[37;1m"
-BLACK="\033[30;0m"
 NC="\033[0m"
 
 if [[ $# -lt 1 || -z "$1" ]]; then
     echo -e "${WHITE}Usage: $0 <target>${NC}" >&2
-    echo -e "${BLUE}Example: $0 aarch64-rpi5-linux-gnu${NC}" >&2
+    echo -e "${BLUE}Example: $0 ${CYAN}aarch64-rpi5-linux-gnu${NC}" >&2
     exit 1
 fi
 

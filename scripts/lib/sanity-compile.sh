@@ -6,7 +6,7 @@
 #
 # Usage: sanity-compile.sh <TARGET> <PREFIX>
 
-set -euox pipefail
+set -euo pipefail
 
 if [[ $# -lt 2 ]]; then
     echo "Usage: $0 <TARGET> <PREFIX>" >&2
