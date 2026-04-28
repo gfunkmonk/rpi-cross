@@ -83,7 +83,7 @@ jobs:
           tool-cache: true
           android: true
           dotnet: true
-          haskell: false
+          haskell: true
           docker-images: true
       - if: '${{ inputs.swapspace }}'
         name: Add Swap Space for Build
