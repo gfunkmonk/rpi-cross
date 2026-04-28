@@ -29,7 +29,7 @@ into the default specs.
 | -------- | ---- | ------------------------------- | -------------------------------------------- |
 | Pi 1 / Zero / Zero W       | 32 | `armv6-rpi-linux-*`        | `gnueabi`, `musleabi`, `uclibcgnueabi`       |
 | Pi 2                        | 32 | `armv7-rpi2-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
-| Pi 3 (32-bit userspace)     | 32 | `armv8-rpi3-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
+| Pi 3 / Zero 2W (32-bit)     | 32 | `armv8-rpi3-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
 | Pi 4 / CM4 (32-bit)         | 32 | `armv8-rpi4-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
 | Pi 3 / Zero 2W              | 64 | `aarch64-rpi3-linux-*`     | `gnu`, `musl`, `uclibc`                      |
 | Pi 4 / CM4                  | 64 | `aarch64-rpi4-linux-*`     | `gnu`, `musl`, `uclibc`                      |
