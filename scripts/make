@@ -24,13 +24,18 @@ if [[ ! -d "targets/${TARGET}" ]]; then
 fi
 
 # Enable Kitware repo
-test -f /usr/share/keyrings/kitware-archive-keyring.gpg || {
+CODENAME=$(lsb_release -cs 2>/dev/null || echo "noble"
+if [ ! -f /usr/share/keyrings/kitware-archive-keyring.gpg ]; then
   wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | \
     gpg --dearmor | \
-    sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg > /dev/null; }
-echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] \
-https://apt.kitware.com/ubuntu/ noble main" | \
-  sudo tee /etc/apt/sources.list.d/kitware.list > /dev/null
+    sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg > /dev/null
+fi
+
+if [ ! -f /etc/apt/sources.list.d/kitware.list ]; then
+  echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] \
+  https://apt.kitware.com/ubuntu/ ${CODENAME} main" | \
+    sudo tee /etc/apt/sources.list.d/kitware.list > /dev/null
+fi
 
 # packages
 export DEBIAN_FRONTEND=noninteractive
