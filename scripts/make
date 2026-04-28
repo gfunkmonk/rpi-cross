@@ -33,7 +33,7 @@ fi
 
 if [ ! -f /etc/apt/sources.list.d/kitware.list ]; then
   echo "deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] \
-  https://apt.kitware.com/ubuntu/ ${CODENAME} main" | \
+https://apt.kitware.com/ubuntu/ ${CODENAME} main" | \
     sudo tee /etc/apt/sources.list.d/kitware.list > /dev/null
 fi
 
