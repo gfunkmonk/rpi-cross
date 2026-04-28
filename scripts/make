@@ -24,7 +24,7 @@ if [[ ! -d "targets/${TARGET}" ]]; then
 fi
 
 # Enable Kitware repo
-CODENAME=$(lsb_release -cs 2>/dev/null || echo "noble"
+CODENAME=$(lsb_release -cs 2>/dev/null || echo "noble")
 if [ ! -f /usr/share/keyrings/kitware-archive-keyring.gpg ]; then
   wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | \
     gpg --dearmor | \
