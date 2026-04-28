@@ -27,3 +27,4 @@ CT_BINUTILS_V_2_46=y
 CT_TOOLCHAIN_PKGVERSION="Raspberry Pi"
 CT_TARGET_CFLAGS="-O2 -pipe -ftree-vectorize -fomit-frame-pointer -ffunction-sections -fdata-sections -mfloat-abi=hard"
 CT_TARGET_LDFLAGS="-Wl,--gc-sections -Wl,-O1 -Wl,--as-needed -s -w"
+# CT_SHOW_CT_VERSION is not set yet

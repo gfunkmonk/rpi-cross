@@ -33,3 +33,4 @@ CT_BINUTILS_V_2_46=y
 CT_TOOLCHAIN_PKGVERSION="Raspberry Pi"
 CT_TARGET_CFLAGS="-O2 -pipe -mthumb -ffixed-r9"
 CT_TARGET_LDFLAGS="-s -w"
+# CT_SHOW_CT_VERSION is not set yet
