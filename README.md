@@ -29,7 +29,7 @@ into the default specs.
 | -------- | ---- | ------------------------------- | -------------------------------------------- |
 | Pi 1 / Zero / Zero W       | 32 | `armv6-rpi-linux-*`        | `gnueabi`, `musleabi`, `uclibcgnueabi`       |
 | Pi 2                        | 32 | `armv7-rpi2-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
-| Pi 3 (32-bit userspace)     | 32 | `armv8-rpi3-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
+| Pi 3 / Zero 2W (32-bit)     | 32 | `armv8-rpi3-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
 | Pi 4 / CM4 (32-bit)         | 32 | `armv8-rpi4-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
 | Pi 3 / Zero 2W              | 64 | `aarch64-rpi3-linux-*`     | `gnu`, `musl`, `uclibc`                      |
 | Pi 4 / CM4                  | 64 | `aarch64-rpi4-linux-*`     | `gnu`, `musl`, `uclibc`                      |
@@ -41,9 +41,9 @@ into the default specs.
 | Pi Pico			       | 32 | `armv6m-pico-eabi`	    | built with `picolib`			 |
 | Pi Pico2		       | 32 | `armv8m-pico-eabi`	    | built with `picolib`			 |
 | Beagle Bone Black		      | 32 | `armv7-beaglebone-linux-*` | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
-| linaro musl                         | 32 | `arm-linaro-musl`           | `Linaro GCC 7.4-2019.02`                     |
-| linaro gnu                         | 32 | `arm-linaro-gnu`           | `Linaro GCC 7.4-2019.02`                     |
-| linaro uclibc-ng                         | 32 | `arm-linaro-uclibc`           | `Linaro GCC 7.4-2019.02`                     |
+| linaro musl                         | 32 | `arm-linaro-musl`           | `Linaro GCC 7.5-2019.12`                     |
+| linaro gnu                         | 32 | `arm-linaro-gnu`           | `Linaro GCC 7.5-2019.12`                     |
+| linaro uclibc-ng                         | 32 | `arm-linaro-uclibc`           | `Linaro GCC 7.5-2019.12`                     |
 
 ## Install (prebuilt tarballs)
 
