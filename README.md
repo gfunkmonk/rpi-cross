@@ -6,7 +6,7 @@
 
 | Component | Version |   
 | --------- | ------- |
-| GCC       | 15      |
+| GCC       | 16      |
 | binutils  | 2.46    |
 | Linux headers | 6.18 |
 | glibc     | 2.43    |
