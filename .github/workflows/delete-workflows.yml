@@ -1,45 +1,45 @@
 name: Delete old workflow runs
+
 on:
   schedule:
-    - cron: '00 2 * * *'
-  # runs at 2 am UTC every day.
+    - cron: '0 2 * * *'   # 02:00 UTC daily
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Only log actions, do not perform any delete operations.'
+        description: 'Only log actions, do not delete anything.'
         type: boolean
         default: true
         required: false
       days:
-        description: 'Number of days.'
+        description: 'Retain runs newer than this many days.'
         required: true
         default: '30'
       minimum_runs:
-        description: 'The minimum runs to keep for each workflow.'
+        description: 'Minimum runs to keep per workflow.'
         required: true
         default: '2'
       delete_workflow_pattern:
-        description: 'The name or filename of the workflow. if not set then it will target all workflows.'
+        description: 'Workflow name/filename to target (leave blank for all).'
         required: false
       delete_run_by_conclusion_pattern:
-        description: 'Remove workflow by conclusion: action_required, cancelled, failure, skipped, success'
+        description: 'Delete runs by conclusion status.'
         required: true
-        default: "All"
+        default: 'All'
         type: choice
         options:
-          - "All"
+          - 'All'
           - action_required
           - cancelled
           - failure
           - skipped
           - success
       delete_workflow_by_state_pattern:
-        description: 'Remove workflow by state: active, deleted, disabled_fork, disabled_inactivity, disabled_manually'
+        description: 'Delete workflows by state.'
         required: true
-        default: "All"
+        default: 'All'
         type: choice
         options:
-          - "All"
+          - 'All'
           - active
           - deleted
           - disabled_inactivity
@@ -48,20 +48,24 @@ on:
 jobs:
   del_runs:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write      # required to delete workflow runs
+      contents: read
+
     steps:
-      - name: Scheduled Delete workflow runs
-        if:   github.event_name != 'workflow_dispatch'
+      - name: Scheduled delete
+        if: github.event_name != 'workflow_dispatch'
         uses: Mattraks/delete-workflow-runs@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           retain_days: 1
           keep_minimum_runs: 4
-          delete_workflow_by_state_pattern: "All"
-          delete_run_by_conclusion_pattern: "All"
+          delete_workflow_by_state_pattern: 'All'
+          delete_run_by_conclusion_pattern: 'All'
 
-      - name: On-demand Delete workflow runs
-        if:   github.event_name == 'workflow_dispatch'
+      - name: On-demand delete
+        if: github.event_name == 'workflow_dispatch'
         uses: Mattraks/delete-workflow-runs@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
