@@ -42,7 +42,6 @@ jobs:
     runs-on: ubuntu-26.04
     strategy:
       fail-fast: false
-      max-parallel: 6
       matrix:
         target:
           - aarch64-rpi3-linux-gnu
