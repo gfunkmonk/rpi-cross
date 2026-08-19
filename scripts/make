@@ -82,6 +82,11 @@ cp targets/"${TARGET}"/config build/.config
   echo 'CT_SAVE_TARBALLS=y'
 } >>build/.config 
 
+if [[  ! -d "/mnt/tarballs" ]]; then
+  sudo mkdir -p /mnt/tarballs 
+  sudo chmod 0777 /mnt/tarballs
+fi
+
 # build as root
 {
   echo 'CT_ALLOW_BUILD_AS_ROOT=y'
