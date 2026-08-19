@@ -1,4 +1,5 @@
-name: Release 'on':
+name: Release
+ 'on':
   workflow_dispatch:
     inputs:
       make_release:
