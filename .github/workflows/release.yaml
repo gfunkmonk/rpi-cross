@@ -1,5 +1,4 @@
-name: Release
-'on':
+name: Release 'on':
   workflow_dispatch:
     inputs:
       make_release:
@@ -135,6 +134,13 @@ jobs:
           key: tarballs-shared-${{ hashFiles('scripts/make', '**/config') }}
           restore-keys: |
             tarballs-shared-
+      - name: CCACHE Cache
+        uses: actions/cache@v6
+        with:
+          path: /mnt/ccache
+          key: ccache-${{ matrix.target }}-${{ github.run_id }}
+          restore-keys: |
+            ccache-${{ matrix.target }}-
       - if: '${{ inputs.sshserver }}'
         name: SSH Server-ing
         uses: valeriangalliat/action-sshd-cloudflared@v4
