@@ -9,9 +9,9 @@
 | GCC       | 16      |
 | binutils  | 2.46    |
 | Linux headers | 6.18 |
-| glibc     | 2.43    |
+| glibc     | 2.44    |
 | musl      | 1.2.6   |
-| uClibc-ng | 1.0.57  |
+| uClibc-ng | 1.0.58  |
 | Linker    | mold (default) |
 
 
