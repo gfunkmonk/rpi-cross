@@ -152,10 +152,10 @@ jobs:
           timeout_minutes: 40
           max_attempts: 2
           command: |
-          umask 0022
-          sudo rm -rf /opt/*
-          chmod +x ./scripts/make
-          bash ./scripts/make ${{ matrix.target }}
+            umask 0022
+            sudo rm -rf /opt/*
+            chmod +x ./scripts/make
+            bash ./scripts/make ${{ matrix.target }}
       - name: Upload Logs on Failure
         if: failure()
         uses: actions/upload-artifact@v7
