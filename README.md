@@ -3,8 +3,7 @@
 [![Release](https://github.com/gfunkmonk/rpi-cross/actions/workflows/release.yaml/badge.svg)](https://github.com/gfunkmonk/rpi-cross/actions/workflows/release.yaml)
 <img align="left" width="262" height="335" alt="clipart3211372-1" src="https://github.com/user-attachments/assets/33d6a411-8462-40ef-a495-eca9487e18e7" />
 
-
-| **_Component_** | **_Version_** |
+| $${\color{lightgreen}Component}$$ | $${\color{blue}Version}$$ |
 |:---------------:|:-------------:|
 | GCC             |         16.20 |
 | binutils        |          2.47 |
