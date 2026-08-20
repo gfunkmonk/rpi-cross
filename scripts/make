@@ -61,7 +61,7 @@ popd
 
 # crosstool-ng
 sudo mkdir -p /opt
-sudo chown 0777 /opt
+sudo chmod 0777 /opt
 sudo rm -rf /opt/ct-ng
 pushd builder
 ./bootstrap
