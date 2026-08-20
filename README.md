@@ -4,16 +4,15 @@
 <img align="left" width="262" height="335" alt="clipart3211372-1" src="https://github.com/user-attachments/assets/33d6a411-8462-40ef-a495-eca9487e18e7" />
 
 
-| Component | Version |   
-| --------- | ------- |
-| GCC       | 16.20   |
-| binutils  | 2.47    |
-| Linux headers | 6.18 |
-| glibc     | 2.44    |
-| musl      | 1.2.6   |
-| uClibc-ng | 1.0.58  |
-| Linker    | mold (default) |
-
+| **_Component_** | **_Version_** |
+|:---------------:|:-------------:|
+| GCC             |         16.20 |
+| binutils        |          2.47 |
+| Linux headers   |       6.18.41 |
+| glibc           |          2.44 |
+| musl            |         1.2.6 |
+| uClibc-ng       |        1.0.58 |
+| Linker (mold)   |        2.42.0 |
 
 
 Per-model tuned cross-compilation toolchains for Raspberry Pi, built with a
@@ -25,26 +24,27 @@ into the default specs.
 
 ## Targets
 
-| Pi model | Bits | Triple prefix                   | Libc variants                                |
-| -------- | ---- | ------------------------------- | -------------------------------------------- |
-| Pi 1 / Zero / Zero W        | 32 | `armv6-rpi-linux-*`        | `gnueabihf`, `musleabihf`, `uclibcgnueabihf`       |
-| Pi 2                        | 32 | `armv7-rpi2-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
-| Pi 3 / Zero 2W (32-bit)     | 32 | `armv8-rpi3-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
-| Pi 4 / CM4 (32-bit)         | 32 | `armv8-rpi4-linux-*`       | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
-| Pi 3 / Zero 2W              | 64 | `aarch64-rpi3-linux-*`     | `gnu`, `musl`, `uclibc`                      |
-| Pi 4 / CM4                  | 64 | `aarch64-rpi4-linux-*`     | `gnu`, `musl`, `uclibc`                      |
-| Pi 5                        | 64 | `aarch64-rpi5-linux-*`     | `gnu`, `musl`, `uclibc`                      |
+|      **_Pi model_**     | **_Bits_** |   **_Triple prefix_**  |              **_Libc variants_**             |
+|:-----------------------:|:----------:|:----------------------:|:--------------------------------------------:|
+| Pi 1 / Zero / Zero W    | 32         | `armv6-rpi-linux-*`    | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
+| Pi 2                    | 32         | `armv7-rpi2-linux-*`   | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
+| Pi 3 / Zero 2W (32-bit) | 32         | `armv8-rpi3-linux-*`   | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
+| Pi 4 / CM4 (32-bit)     | 32         | `armv8-rpi4-linux-*`   | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
+| Pi 3 / Zero 2W          | 64         | `aarch64-rpi3-linux-*` | `gnu`, `musl`, `uclibc`                      |
+| Pi 4 / CM4              | 64         | `aarch64-rpi4-linux-*` | `gnu`, `musl`, `uclibc`                      |
+| Pi 5                    | 64         | `aarch64-rpi5-linux-*` | `gnu`, `musl`, `uclibc`                      |
 
 ## Miscellaneous
-| Type     | Bits | Triple                             | Notes
-| ------------------| ---- | ---------------------------------- | ---------------------------------------------|
-| Pi Pico			       | 32 | `armv6m-pico-eabi`	    | built with `picolib`			 |
-| Pi Pico2		       | 32 | `armv8m-pico-eabihf`	    | built with `picolib`			 |
-| Beagle Bone Black		       | 32 | `armv7-beaglebone-linux-*`    | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
-| linaro musl                        | 32 | `arm-linaro-musl`             | `Linaro GCC 7.4-2019.02`                     |
-| linaro gnu                         | 32 | `arm-linaro-gnu`              | `Linaro GCC 7.4-2019.02`                     |
-| linaro uclibc-ng                   | 32 | `arm-linaro-uclibc`           | `Linaro GCC 7.4-2019.02`                     |
 
+|     **_Type_**    | **_Bits_** |        **_Triple_**        |                  **_Notes_**                 |
+|:-----------------:|:----------:|:--------------------------:|:--------------------------------------------:|
+| Pi Pico           | 32         | `armv6m-pico-eabi`         | built with `picolib`                         |
+| Pi Pico2          | 32         | `armv8m-pico-eabihf`       | built with `picolib`                         |
+| Beagle Bone Black | 32         | `armv7-beaglebone-linux-*` | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
+| linaro musl       | 32         | `arm-linaro-musl`          | `Linaro GCC 7.4-2019.02`                     |
+| linaro gnu        | 32         | `arm-linaro-gnu`           | `Linaro GCC 7.4-2019.02`                     |
+| linaro uclibc-ng  | 32         | `arm-linaro-uclibc`        | `Linaro GCC 7.4-2019.02`                     |
+|                   |            |                            |                                              |
 ## Install (prebuilt tarballs)
 
 Pick a target from the [latest release](https://github.com/gfunkmonk/rpi-cross/releases/latest)
