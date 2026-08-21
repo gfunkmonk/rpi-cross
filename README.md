@@ -23,7 +23,7 @@ into the default specs.
 
 ## Targets
 
-|      **_Pi model_**     | **_Bits_** |   **_Triple prefix_**  |              **_Libc variants_**             |
+|  $\large{\textbf{\color{#55DD33}{Pi Model}}}$ | $\large{\textbf{\color{#FCCA43}{Bits}}}$ | $\large{\textbf{\color{#BF73DF}{Triple prefix}}}$ |              $\large{\textbf{\color{#EF8A76}{Libc Variants}}}$ |
 |:-----------------------:|:----------:|:----------------------:|:--------------------------------------------:|
 | Pi 1 / Zero / Zero W    | 32         | `armv6-rpi-linux-*`    | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
 | Pi 2                    | 32         | `armv7-rpi2-linux-*`   | `gnueabihf`, `musleabihf`, `uclibcgnueabihf` |
@@ -35,7 +35,7 @@ into the default specs.
 
 ## Miscellaneous
 
-|     **_Type_**    | **_Bits_** |        **_Triple_**        |                  **_Notes_**                 |
+| $\large{\textbf{\color{#04BE84}{Type}}}$ | $\large{\textbf{\color{#A50087}{Bits}}}$ | $\large{\textbf{\color{#E0DA4D}{Triple}}}$ | $\large{\textbf{\color{#D76339}{Notes}}}$ |
 |:-----------------:|:----------:|:--------------------------:|:--------------------------------------------:|
 | Pi Pico           | 32         | `armv6m-pico-eabi`         | built with `picolib`                         |
 | Pi Pico2          | 32         | `armv8m-pico-eabihf`       | built with `picolib`                         |
